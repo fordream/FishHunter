@@ -28,13 +28,18 @@ import org.anddev.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlas;
 import org.anddev.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlasTextureRegionFactory;
 import org.anddev.andengine.opengl.texture.region.TextureRegion;
 
+import com.example.game.object.music.BackgroundMusic;
+
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.view.KeyEvent;
 import android.widget.Toast;
 
 public class AndEngineSimpleGame extends BaseMGameActivty implements IOnSceneTouchListener {
-
+	/**
+ * 
+ */
+	private BackgroundMusic backgroundMusic = new BackgroundMusic();
 	// private Camera mCamera;
 
 	// This one is for the font
@@ -64,7 +69,7 @@ public class AndEngineSimpleGame extends BaseMGameActivty implements IOnSceneTou
 	private LinkedList<Sprite> projectilesToBeAdded;
 	private LinkedList<Sprite> TargetsToBeAdded;
 	private Sound shootingSound;
-	private Music backgroundMusic;
+	// private Music backgroundMusic;
 	private boolean runningFlag = false;
 	private boolean pauseFlag = false;
 	private CameraScene mPauseScene;
@@ -112,16 +117,7 @@ public class AndEngineSimpleGame extends BaseMGameActivty implements IOnSceneTou
 			e.printStackTrace();
 		}
 
-		MusicFactory.setAssetBasePath("mfx/");
-
-		try {
-			backgroundMusic = MusicFactory.createMusicFromAsset(mEngine.getMusicManager(), this, "background_music.wav");
-			backgroundMusic.setLooping(true);
-		} catch (IllegalStateException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		backgroundMusic.onLoadResources(mEngine, this);
 
 	}
 
@@ -156,9 +152,6 @@ public class AndEngineSimpleGame extends BaseMGameActivty implements IOnSceneTou
 		mMainScene.setOnSceneTouchListener(this);
 
 		// set coordinates for the player
-		// final int PlayerX = this.mPlayerTextureRegion.getWidth() / 2;
-		// final int PlayerY = (int) ((mCamera.getHeight() -
-		// mPlayerTextureRegion.getHeight()) / 2);
 		final int PlayerX = (int) (getmCamera().getWidth() - mPlayerTextureRegion.getWidth()) / 2;
 		final int PlayerY = (int) ((getmCamera().getHeight() - mPlayerTextureRegion.getHeight()));
 		// set the player on the scene
@@ -418,14 +411,12 @@ public class AndEngineSimpleGame extends BaseMGameActivty implements IOnSceneTou
 
 	public void pauseMusic() {
 		if (runningFlag)
-			if (backgroundMusic.isPlaying())
-				backgroundMusic.pause();
+			backgroundMusic.pause();
 	}
 
 	public void resumeMusic() {
 		if (runningFlag)
-			if (!backgroundMusic.isPlaying())
-				backgroundMusic.resume();
+			backgroundMusic.resume();
 	}
 
 	public void fail() {
