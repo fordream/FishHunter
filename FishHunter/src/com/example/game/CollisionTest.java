@@ -1,7 +1,5 @@
 package com.example.game;
 
-import java.util.LinkedList;
-
 import org.anddev.andengine.engine.Engine;
 import org.anddev.andengine.engine.camera.Camera;
 import org.anddev.andengine.engine.handler.IUpdateHandler;
@@ -9,10 +7,8 @@ import org.anddev.andengine.engine.options.EngineOptions;
 import org.anddev.andengine.engine.options.EngineOptions.ScreenOrientation;
 import org.anddev.andengine.engine.options.resolutionpolicy.RatioResolutionPolicy;
 import org.anddev.andengine.entity.modifier.MoveXModifier;
-import org.anddev.andengine.entity.primitive.Rectangle;
 import org.anddev.andengine.entity.scene.Scene;
 import org.anddev.andengine.entity.scene.background.ColorBackground;
-import org.anddev.andengine.entity.shape.RectangularShape;
 import org.anddev.andengine.entity.sprite.Sprite;
 import org.anddev.andengine.entity.util.FPSLogger;
 import org.anddev.andengine.opengl.texture.TextureOptions;
@@ -34,33 +30,25 @@ public class CollisionTest extends BaseGameActivity {
 
 	@Override
 	public void onLoadComplete() {
-		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	public Engine onLoadEngine() {
 		this.mCamera = new Camera(0, 0, CAMERA_WIDTH, CAMERA_HEIGHT);
-		final EngineOptions engineOptions = new EngineOptions(true,
-				ScreenOrientation.LANDSCAPE, new RatioResolutionPolicy(
-						CAMERA_WIDTH, CAMERA_HEIGHT), mCamera);
+		final EngineOptions engineOptions = new EngineOptions(true, ScreenOrientation.LANDSCAPE, new RatioResolutionPolicy(CAMERA_WIDTH, CAMERA_HEIGHT), mCamera);
 		return new Engine(engineOptions);
 	}
 
 	@Override
 	public void onLoadResources() {
 		// prepare a container for the image
-		this.mBitmapTextureAtlas = new BitmapTextureAtlas(128, 128,
-				TextureOptions.BILINEAR_PREMULTIPLYALPHA);
+		this.mBitmapTextureAtlas = new BitmapTextureAtlas(128, 128, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
 
 		// loading the image inside the container
-		this.mPlayerTextureRegion = BitmapTextureAtlasTextureRegionFactory
-				.createFromAsset(mBitmapTextureAtlas, this, "gfx/Player.png",
-						0, 0);
+		this.mPlayerTextureRegion = BitmapTextureAtlasTextureRegionFactory.createFromAsset(mBitmapTextureAtlas, this, "gfx/Player.png", 0, 0);
 
-		this.mTargetTextureRegion = BitmapTextureAtlasTextureRegionFactory
-				.createFromAsset(mBitmapTextureAtlas, this, "gfx/Target.png",
-						64, 0);
+		this.mTargetTextureRegion = BitmapTextureAtlasTextureRegionFactory.createFromAsset(mBitmapTextureAtlas, this, "gfx/Target.png", 64, 0);
 
 		this.mEngine.getTextureManager().loadTexture(mBitmapTextureAtlas);
 

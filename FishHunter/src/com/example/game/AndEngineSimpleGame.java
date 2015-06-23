@@ -9,14 +9,9 @@ import org.anddev.andengine.audio.music.Music;
 import org.anddev.andengine.audio.music.MusicFactory;
 import org.anddev.andengine.audio.sound.Sound;
 import org.anddev.andengine.audio.sound.SoundFactory;
-import org.anddev.andengine.engine.Engine;
-import org.anddev.andengine.engine.camera.Camera;
 import org.anddev.andengine.engine.handler.IUpdateHandler;
 import org.anddev.andengine.engine.handler.timer.ITimerCallback;
 import org.anddev.andengine.engine.handler.timer.TimerHandler;
-import org.anddev.andengine.engine.options.EngineOptions;
-import org.anddev.andengine.engine.options.EngineOptions.ScreenOrientation;
-import org.anddev.andengine.engine.options.resolutionpolicy.RatioResolutionPolicy;
 import org.anddev.andengine.entity.modifier.MoveModifier;
 import org.anddev.andengine.entity.modifier.MoveXModifier;
 import org.anddev.andengine.entity.scene.CameraScene;
@@ -32,17 +27,15 @@ import org.anddev.andengine.opengl.texture.TextureOptions;
 import org.anddev.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlas;
 import org.anddev.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlasTextureRegionFactory;
 import org.anddev.andengine.opengl.texture.region.TextureRegion;
-import org.anddev.andengine.ui.activity.BaseGameActivity;
 
 import android.graphics.Color;
 import android.graphics.Typeface;
-import android.view.Display;
 import android.view.KeyEvent;
 import android.widget.Toast;
 
-public class AndEngineSimpleGame extends BaseGameActivity implements IOnSceneTouchListener {
+public class AndEngineSimpleGame extends BaseMGameActivty implements IOnSceneTouchListener {
 
-	private Camera mCamera;
+	// private Camera mCamera;
 
 	// This one is for the font
 	private BitmapTextureAtlas mFontTexture;
@@ -78,22 +71,6 @@ public class AndEngineSimpleGame extends BaseGameActivity implements IOnSceneTou
 	private CameraScene mResultScene;
 	private int hitCount;
 	private final int maxScore = 10;
-
-	@Override
-	public Engine onLoadEngine() {
-
-		// getting the device's screen size
-		final Display display = getWindowManager().getDefaultDisplay();
-		int cameraWidth = display.getWidth();
-		int cameraHeight = display.getHeight();
-
-		// setting up the camera [AndEngine's camera , not the one you take
-		// pictures with]
-		mCamera = new Camera(0, 0, cameraWidth, cameraHeight);
-
-		// Engine with varius options
-		return new Engine(new EngineOptions(true, ScreenOrientation.LANDSCAPE, new RatioResolutionPolicy(cameraWidth, cameraHeight), mCamera).setNeedsSound(true).setNeedsMusic(true));
-	}
 
 	@Override
 	public void onLoadResources() {
@@ -152,17 +129,17 @@ public class AndEngineSimpleGame extends BaseGameActivity implements IOnSceneTou
 	public Scene onLoadScene() {
 		mEngine.registerUpdateHandler(new FPSLogger());
 		// creating a new scene for the pause menu
-		mPauseScene = new CameraScene(mCamera);
+		mPauseScene = new CameraScene(getmCamera());
 		/* Make the label centered on the camera. */
-		final int x = (int) (mCamera.getWidth() / 2 - mPausedTextureRegion.getWidth() / 2);
-		final int y = (int) (mCamera.getHeight() / 2 - mPausedTextureRegion.getHeight() / 2);
+		final int x = (int) (getmCamera().getWidth() / 2 - mPausedTextureRegion.getWidth() / 2);
+		final int y = (int) (getmCamera().getHeight() / 2 - mPausedTextureRegion.getHeight() / 2);
 		final Sprite pausedSprite = new Sprite(x, y, mPausedTextureRegion);
 		mPauseScene.attachChild(pausedSprite);
 		// makes the scene transparent
 		mPauseScene.setBackgroundEnabled(false);
 
 		// the results scene, for win/fail
-		mResultScene = new CameraScene(mCamera);
+		mResultScene = new CameraScene(getmCamera());
 		winSprite = new Sprite(x, y, mWinTextureRegion);
 		failSprite = new Sprite(x, y, mFailTextureRegion);
 		mResultScene.attachChild(winSprite);
@@ -182,8 +159,8 @@ public class AndEngineSimpleGame extends BaseGameActivity implements IOnSceneTou
 		// final int PlayerX = this.mPlayerTextureRegion.getWidth() / 2;
 		// final int PlayerY = (int) ((mCamera.getHeight() -
 		// mPlayerTextureRegion.getHeight()) / 2);
-		final int PlayerX = (int) (mCamera.getWidth() - mPlayerTextureRegion.getWidth()) / 2;
-		final int PlayerY = (int) ((mCamera.getHeight() - mPlayerTextureRegion.getHeight()));
+		final int PlayerX = (int) (getmCamera().getWidth() - mPlayerTextureRegion.getWidth()) / 2;
+		final int PlayerY = (int) ((getmCamera().getHeight() - mPlayerTextureRegion.getHeight()));
 		// set the player on the scene
 		player = new Sprite(PlayerX, PlayerY, mPlayerTextureRegion);
 		player.setScale(2);
@@ -198,7 +175,7 @@ public class AndEngineSimpleGame extends BaseGameActivity implements IOnSceneTou
 		// correctly on the screen
 		score = new ChangeableText(0, 0, mFont, String.valueOf(maxScore));
 		// repositioning the score later so we can use the score.getWidth()
-		score.setPosition(mCamera.getWidth() - score.getWidth() - 5, 5);
+		score.setPosition(getmCamera().getWidth() - score.getWidth() - 5, 5);
 
 		createSpriteSpawnTimeHandler();
 		mMainScene.registerUpdateHandler(detect);
@@ -246,7 +223,7 @@ public class AndEngineSimpleGame extends BaseGameActivity implements IOnSceneTou
 					_projectile = projectiles.next();
 
 					// in case the projectile left the screen
-					if (_projectile.getX() >= mCamera.getWidth() || _projectile.getY() >= mCamera.getHeight() + _projectile.getHeight() || _projectile.getY() <= -_projectile.getHeight()) {
+					if (_projectile.getX() >= getmCamera().getWidth() || _projectile.getY() >= getmCamera().getHeight() + _projectile.getHeight() || _projectile.getY() <= -_projectile.getHeight()) {
 						removeSprite(_projectile, projectiles);
 						continue;
 					}
@@ -322,7 +299,7 @@ public class AndEngineSimpleGame extends BaseGameActivity implements IOnSceneTou
 		projectile = new Sprite(player.getX(), player.getY(), mProjectileTextureRegion.deepCopy());
 		mMainScene.attachChild(projectile, 1);
 
-		int realX = (int) (mCamera.getWidth() + projectile.getWidth() / 2.0f);
+		int realX = (int) (getmCamera().getWidth() + projectile.getWidth() / 2.0f);
 		float ratio = (float) offY / (float) offX;
 		int realY = (int) ((realX * ratio) + projectile.getY());
 
@@ -346,9 +323,9 @@ public class AndEngineSimpleGame extends BaseGameActivity implements IOnSceneTou
 	public void addTarget() {
 		Random rand = new Random();
 
-		int x = (int) mCamera.getWidth() + mTargetTextureRegion.getWidth();
+		int x = (int) getmCamera().getWidth() + mTargetTextureRegion.getWidth();
 		int minY = mTargetTextureRegion.getHeight();
-		int maxY = (int) (mCamera.getHeight() - mTargetTextureRegion.getHeight());
+		int maxY = (int) (getmCamera().getHeight() - mTargetTextureRegion.getHeight());
 		int rangeY = maxY - minY;
 		int y = rand.nextInt(rangeY) + minY;
 
