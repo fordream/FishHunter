@@ -5,8 +5,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Random;
 
-import org.anddev.andengine.audio.music.Music;
-import org.anddev.andengine.audio.music.MusicFactory;
 import org.anddev.andengine.audio.sound.Sound;
 import org.anddev.andengine.audio.sound.SoundFactory;
 import org.anddev.andengine.engine.handler.IUpdateHandler;
@@ -28,12 +26,13 @@ import org.anddev.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlas;
 import org.anddev.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlasTextureRegionFactory;
 import org.anddev.andengine.opengl.texture.region.TextureRegion;
 
-import com.example.game.object.music.BackgroundMusic;
-
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.view.KeyEvent;
 import android.widget.Toast;
+
+import com.example.game.object.music.BackgroundMusic;
+import com.example.game.utils.GAMEMODESTATUS;
 
 public class AndEngineSimpleGame extends BaseMGameActivty implements IOnSceneTouchListener {
 	/**
@@ -206,7 +205,8 @@ public class AndEngineSimpleGame extends BaseMGameActivty implements IOnSceneTou
 				// and call a fail
 				if (_target.getX() <= -_target.getWidth()) {
 					removeSprite(_target, targets);
-					fail();
+					// fail();
+					gameMode(GAMEMODESTATUS.FAIL);
 					break;
 				}
 				Iterator<Sprite> projectiles = projectileLL.iterator();
@@ -242,7 +242,8 @@ public class AndEngineSimpleGame extends BaseMGameActivty implements IOnSceneTou
 
 			// if max score , then we are done
 			if (hitCount >= maxScore) {
-				win();
+				gameMode(GAMEMODESTATUS.WIN);
+				// win();
 			}
 
 			// a work around to avoid ConcurrentAccessException
@@ -383,7 +384,7 @@ public class AndEngineSimpleGame extends BaseMGameActivty implements IOnSceneTou
 		if (runningFlag) {
 			pauseMusic();
 			if (mEngine.isRunning()) {
-				pauseGame();
+				gameMode(GAMEMODESTATUS.PAUSE);
 				pauseFlag = true;
 			}
 		}
@@ -409,6 +410,25 @@ public class AndEngineSimpleGame extends BaseMGameActivty implements IOnSceneTou
 		}
 	}
 
+	public void gameMode(GAMEMODESTATUS gamemode) {
+		if (gamemode == GAMEMODESTATUS.FAIL && mEngine.isRunning()) {
+			winSprite.setVisible(false);
+			failSprite.setVisible(true);
+			mMainScene.setChildScene(mResultScene, false, true, true);
+			mEngine.stop();
+		} else if (gamemode == GAMEMODESTATUS.WIN && mEngine.isRunning()) {
+			failSprite.setVisible(false);
+			winSprite.setVisible(true);
+			mMainScene.setChildScene(mResultScene, false, true, true);
+			mEngine.stop();
+		} else if (gamemode == GAMEMODESTATUS.PAUSE && runningFlag) {
+			mMainScene.setChildScene(mPauseScene, false, true, true);
+			mEngine.stop();
+		} else if (gamemode == GAMEMODESTATUS.UNPAUSE) {
+			mMainScene.clearChildScene();
+		}
+	}
+
 	public void pauseMusic() {
 		if (runningFlag)
 			backgroundMusic.pause();
@@ -419,35 +439,6 @@ public class AndEngineSimpleGame extends BaseMGameActivty implements IOnSceneTou
 			backgroundMusic.resume();
 	}
 
-	public void fail() {
-		if (mEngine.isRunning()) {
-			winSprite.setVisible(false);
-			failSprite.setVisible(true);
-			mMainScene.setChildScene(mResultScene, false, true, true);
-			mEngine.stop();
-		}
-	}
-
-	public void win() {
-		if (mEngine.isRunning()) {
-			failSprite.setVisible(false);
-			winSprite.setVisible(true);
-			mMainScene.setChildScene(mResultScene, false, true, true);
-			mEngine.stop();
-		}
-	}
-
-	public void pauseGame() {
-		if (runningFlag) {
-			mMainScene.setChildScene(mPauseScene, false, true, true);
-			mEngine.stop();
-		}
-	}
-
-	public void unPauseGame() {
-		mMainScene.clearChildScene();
-	}
-
 	@Override
 	public boolean onKeyDown(final int pKeyCode, final KeyEvent pEvent) {
 		// if menu button is pressed
@@ -455,11 +446,11 @@ public class AndEngineSimpleGame extends BaseMGameActivty implements IOnSceneTou
 			if (mEngine.isRunning() && backgroundMusic.isPlaying()) {
 				pauseMusic();
 				pauseFlag = true;
-				pauseGame();
+				gameMode(GAMEMODESTATUS.PAUSE);
 				Toast.makeText(this, "Menu button to resume", Toast.LENGTH_SHORT).show();
 			} else {
 				if (!backgroundMusic.isPlaying()) {
-					unPauseGame();
+					gameMode(GAMEMODESTATUS.UNPAUSE);
 					pauseFlag = false;
 					resumeMusic();
 					mEngine.start();
