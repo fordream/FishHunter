@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+<color name="active">#aaf3dada</color>    
+<color name="pressed">#aae27fe8</color>
+</resources>

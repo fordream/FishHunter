@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item>
+        <shape>
+            <solid android:color="@color/active" />
+            <!--
+            <stroke
+                android:width="2px"
+                android:color="#16aff0" />
+            -->
+            <corners
+                android:bottomLeftRadius="@dimen/dimen_5dp"
+                android:bottomRightRadius="@dimen/dimen_5dp"
+                android:topLeftRadius="@dimen/dimen_5dp"
+                android:topRightRadius="@dimen/dimen_5dp" />
+        </shape>
+    </item>
+
+    <!--
+    <item>
+        <shape>
+            <solid android:color="#10CCCCCC" />
+
+            <corners
+                android:bottomLeftRadius="6px"
+                android:bottomRightRadius="6px"
+                android:topLeftRadius="6px"
+                android:topRightRadius="6px" />
+        </shape>
+    </item>
+    <item>
+        <shape>
+            <solid android:color="#20CCCCCC" />
+
+            <corners
+                android:bottomLeftRadius="6px"
+                android:bottomRightRadius="6px"
+                android:topLeftRadius="6px"
+                android:topRightRadius="6px" />
+        </shape>
+    </item>
+    <item>
+        <shape>
+            <solid android:color="#30CCCCCC" />
+
+            <corners
+                android:bottomLeftRadius="6px"
+                android:bottomRightRadius="6px"
+                android:topLeftRadius="6px"
+                android:topRightRadius="6px" />
+        </shape>
+    </item>
+    <item>
+        <shape>
+            <solid android:color="#50CCCCCC" />
+
+            <corners
+                android:bottomLeftRadius="6px"
+                android:bottomRightRadius="6px"
+                android:topLeftRadius="6px"
+                android:topRightRadius="6px" />
+        </shape>
+    </item>
+    -->
+    <!-- background -->
+    <!--
+    <item android:bottom="5px">
+        <rotate>
+            <shape android:shape="rectangle" >
+                <solid android:color="#336699" />
+
+                <stroke
+                    android:width="1px"
+                    android:color="#336699" />
+
+                <corners
+                    android:bottomLeftRadius="6px"
+                    android:bottomRightRadius="6px"
+                    android:topLeftRadius="6px"
+                    android:topRightRadius="6px" />
+            </shape>
+        </rotate>
+    </item>
+    -->
+
+</layer-list>

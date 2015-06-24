@@ -87,11 +87,11 @@ public class AndEngineSimpleGame extends BaseMGameActivty implements IOnSceneTou
 		BitmapTextureAtlasTextureRegionFactory.setAssetBasePath("gfx/");
 
 		// loading the image inside the container
-		mPlayerTextureRegion = BitmapTextureAtlasTextureRegionFactory.createFromAsset(this.mBitmapTextureAtlas, this, "Player.png", 0, 0);
+		mPlayerTextureRegion = BitmapTextureAtlasTextureRegionFactory.createFromAsset(this.mBitmapTextureAtlas, this, "player_01.png", 0, 0);
 
-		mProjectileTextureRegion = BitmapTextureAtlasTextureRegionFactory.createFromAsset(this.mBitmapTextureAtlas, this, "Projectile.png", 64, 0);
+		mProjectileTextureRegion = BitmapTextureAtlasTextureRegionFactory.createFromAsset(this.mBitmapTextureAtlas, this, "Projectile_01.png", 64, 0);
 
-		mTargetTextureRegion = BitmapTextureAtlasTextureRegionFactory.createFromAsset(this.mBitmapTextureAtlas, this, "Target.png", 128, 0);
+		mTargetTextureRegion = BitmapTextureAtlasTextureRegionFactory.createFromAsset(this.mBitmapTextureAtlas, this, "target_01.png", 128, 0);
 
 		mPausedTextureRegion = BitmapTextureAtlasTextureRegionFactory.createFromAsset(this.mBitmapTextureAtlas, this, "paused.png", 0, 64);
 
@@ -155,7 +155,7 @@ public class AndEngineSimpleGame extends BaseMGameActivty implements IOnSceneTou
 		final int PlayerY = (int) ((getmCamera().getHeight() - mPlayerTextureRegion.getHeight()));
 		// set the player on the scene
 		player = new Sprite(PlayerX, PlayerY, mPlayerTextureRegion);
-		player.setScale(2);
+		// player.setScale(2);
 
 		// initializing variables
 		projectileLL = new LinkedList<Sprite>();
@@ -285,12 +285,13 @@ public class AndEngineSimpleGame extends BaseMGameActivty implements IOnSceneTou
 
 		int offX = (int) (pX - player.getX());
 		int offY = (int) (pY - player.getY());
-		if (offX <= 0)
-			return;
+		if (offX <= 0) {
+			// FIXME
+			// return;
+		}
 
-		final Sprite projectile;
 		// position the projectile on the player
-		projectile = new Sprite(player.getX(), player.getY(), mProjectileTextureRegion.deepCopy());
+		Sprite projectile = new Sprite(player.getX() + player.getWidth() / 2, player.getY() + player.getHeight(), mProjectileTextureRegion.deepCopy());
 		mMainScene.attachChild(projectile, 1);
 
 		int realX = (int) (getmCamera().getWidth() + projectile.getWidth() / 2.0f);
@@ -412,10 +413,12 @@ public class AndEngineSimpleGame extends BaseMGameActivty implements IOnSceneTou
 
 	public void gameMode(GAMEMODESTATUS gamemode) {
 		if (gamemode == GAMEMODESTATUS.FAIL && mEngine.isRunning()) {
-			winSprite.setVisible(false);
-			failSprite.setVisible(true);
-			mMainScene.setChildScene(mResultScene, false, true, true);
-			mEngine.stop();
+			// FIXME
+
+			// winSprite.setVisible(false);
+			// failSprite.setVisible(true);
+			// mMainScene.setChildScene(mResultScene, false, true, true);
+			// mEngine.stop();
 		} else if (gamemode == GAMEMODESTATUS.WIN && mEngine.isRunning()) {
 			failSprite.setVisible(false);
 			winSprite.setVisible(true);

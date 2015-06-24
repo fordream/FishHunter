@@ -21,7 +21,7 @@ public abstract class BaseMGameActivty extends BaseGameActivity {
 		final Display display = getWindowManager().getDefaultDisplay();
 		int cameraWidth = display.getWidth();
 		int cameraHeight = display.getHeight();
-		mCamera = new Camera(0, 0, cameraWidth, cameraHeight);
+		mCamera = new Camera(0, 0, 960, 640);
 		return new Engine(new EngineOptions(true, ScreenOrientation.LANDSCAPE, new RatioResolutionPolicy(cameraWidth, cameraHeight), mCamera).setNeedsSound(true).setNeedsMusic(true));
 	}
 }

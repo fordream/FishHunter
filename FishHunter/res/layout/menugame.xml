@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:gravity="center"
+    android:orientation="horizontal" >
+
+    <ImageView
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:scaleType="centerCrop"
+        android:src="@drawable/bg" />
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:gravity="center"
+        android:orientation="horizontal" >
+
+        <Button
+            android:id="@+id/play"
+            android:layout_width="@dimen/dimen_50dp"
+            android:layout_height="@dimen/dimen_50dp"
+            android:background="@drawable/xml_sip_btn_login"
+            android:text="Play"
+            android:textColor="@android:color/black"
+            android:textSize="@dimen/dimen_10dp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/score"
+            android:layout_width="@dimen/dimen_50dp"
+            android:layout_height="@dimen/dimen_50dp"
+            android:layout_marginLeft="@dimen/dimen_5dp"
+            android:layout_marginRight="@dimen/dimen_5dp"
+            android:background="@drawable/xml_sip_btn_login"
+            android:text="Score"
+            android:textColor="@android:color/black"
+            android:textSize="@dimen/dimen_10dp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/moregame"
+            android:layout_width="@dimen/dimen_50dp"
+            android:layout_height="@dimen/dimen_50dp"
+            android:background="@drawable/xml_sip_btn_login"
+            android:text="More Game"
+            android:textColor="@android:color/black"
+            android:textSize="@dimen/dimen_10dp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+</RelativeLayout>
