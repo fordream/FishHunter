@@ -11,55 +11,39 @@ import org.anddev.andengine.entity.modifier.MoveModifier;
 import org.anddev.andengine.entity.modifier.MoveXModifier;
 import org.anddev.andengine.entity.scene.CameraScene;
 import org.anddev.andengine.entity.scene.Scene;
-import org.anddev.andengine.entity.scene.Scene.IOnSceneTouchListener;
-import org.anddev.andengine.entity.scene.background.ColorBackground;
 import org.anddev.andengine.entity.sprite.Sprite;
 import org.anddev.andengine.entity.text.ChangeableText;
-import org.anddev.andengine.entity.util.FPSLogger;
 import org.anddev.andengine.input.touch.TouchEvent;
 import org.anddev.andengine.opengl.font.Font;
 import org.anddev.andengine.opengl.texture.TextureOptions;
 import org.anddev.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlas;
-import org.anddev.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlasTextureRegionFactory;
 import org.anddev.andengine.opengl.texture.region.TextureRegion;
-
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.widget.Toast;
-
-import com.example.game.object.BGGame;
+import com.example.game.object.Fail;
+import com.example.game.object.Pause;
 import com.example.game.object.Player;
+import com.example.game.object.Projectile;
+import com.example.game.object.Target;
+import com.example.game.object.Win;
 import com.example.game.object.music.BackgroundMusic;
 import com.example.game.object.music.EnumMusic;
 import com.example.game.object.music.ShootingSound;
 import com.example.game.utils.GAMEMODESTATUS;
 
-public class AndEngineSimpleGame extends BaseMGameActivty implements IOnSceneTouchListener {
-	private BGGame bgGame = new BGGame();
-	private Player player = new Player();
-	// /////////////////////////////////////////////////////////
+public class AndEngineSimpleGame extends BaseMGameActivty {
 
 	private BitmapTextureAtlas mFontTexture;
 	private Font mFont;
 	private ChangeableText score;
 
-	private TextureRegion mProjectileTextureRegion;
-	private TextureRegion mTargetTextureRegion;
-	private TextureRegion mPausedTextureRegion;
-	private TextureRegion mWinTextureRegion;
-	private TextureRegion mFailTextureRegion;
-
-	private Scene mMainScene;
-	private Sprite winSprite;
-	private Sprite failSprite;
-
 	private LinkedList<Sprite> projectileLL;
 	private LinkedList<Sprite> targetLL;
-	private LinkedList<Sprite> projectilesToBeAdded;
-	private LinkedList<Sprite> TargetsToBeAdded;
-	// private Sound shootingSound;
+	private LinkedList<Sprite> projectilesToBeAdded = new LinkedList<Sprite>();
+	private LinkedList<Sprite> TargetsToBeAdded = new LinkedList<Sprite>();
 	private boolean runningFlag = false;
 	private boolean pauseFlag = false;
 	private CameraScene mPauseScene;
@@ -70,62 +54,49 @@ public class AndEngineSimpleGame extends BaseMGameActivty implements IOnSceneTou
 	@Override
 	protected void onCreate(Bundle pSavedInstanceState) {
 		super.onCreate(pSavedInstanceState);
+		/**
+		 * add sound and music
+		 */
 		addSounds(EnumMusic.BACKGROUNDMISIC, new BackgroundMusic());
 		addSounds(EnumMusic.SHOOTINGSHOUND, new ShootingSound());
+
+		/**
+		 * charactor
+		 */
+		addCharactors("player", new Player());
+		addCharactors("projectile", new Projectile());
+		addCharactors("target", new Target());
+
+		addCharactors("win", new Win());
+		addCharactors("fail", new Fail());
+		addCharactors("pause", new Pause());
 	}
 
 	@Override
 	public void onLoadResources() {
+		super.onLoadResources();
+
 		mFontTexture = new BitmapTextureAtlas(256, 256, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
-		BitmapTextureAtlasTextureRegionFactory.setAssetBasePath("gfx/");
-		player.onLoadResources(this, getBitmapTextureAtlas());
-		mProjectileTextureRegion = BitmapTextureAtlasTextureRegionFactory.createFromAsset(getBitmapTextureAtlas(), this, "Projectile_01.png", 64, 0);
-		mTargetTextureRegion = BitmapTextureAtlasTextureRegionFactory.createFromAsset(getBitmapTextureAtlas(), this, "target_01.png", 128, 0);
-		mPausedTextureRegion = BitmapTextureAtlasTextureRegionFactory.createFromAsset(getBitmapTextureAtlas(), this, "paused.png", 0, 64);
-		mWinTextureRegion = BitmapTextureAtlasTextureRegionFactory.createFromAsset(getBitmapTextureAtlas(), this, "win.png", 0, 128);
-		mFailTextureRegion = BitmapTextureAtlasTextureRegionFactory.createFromAsset(getBitmapTextureAtlas(), this, "fail.png", 0, 256);
-
-		bgGame.onLoadResources(this, getBitmapTextureAtlas());
-		// preparing the font
 		mFont = new Font(mFontTexture, Typeface.create(Typeface.DEFAULT, Typeface.BOLD), 40, true, Color.BLACK);
-
-		// loading textures in the engine
-		mEngine.getTextureManager().loadTexture(getBitmapTextureAtlas());
 		mEngine.getTextureManager().loadTexture(mFontTexture);
 		mEngine.getFontManager().loadFont(mFont);
 
-		onLoadSoundsResources(mEngine);
 	}
 
 	@Override
 	public Scene onLoadScene() {
-		mEngine.registerUpdateHandler(new FPSLogger());
-		// creating a new scene for the pause menu
+		Scene mMainScene = super.onLoadScene();
+		getCharactor("player").onLoadScene(getmCamera(), null);
+
 		mPauseScene = new CameraScene(getmCamera());
-		/* Make the label centered on the camera. */
-		final int x = (int) (getmCamera().getWidth() / 2 - mPausedTextureRegion.getWidth() / 2);
-		final int y = (int) (getmCamera().getHeight() / 2 - mPausedTextureRegion.getHeight() / 2);
-		final Sprite pausedSprite = new Sprite(x, y, mPausedTextureRegion);
-		mPauseScene.attachChild(pausedSprite);
-		// makes the scene transparent
 		mPauseScene.setBackgroundEnabled(false);
+		getCharactor("pause").onLoadScene(getmCamera(), mPauseScene);
 
-		// the results scene, for win/fail
 		mResultScene = new CameraScene(getmCamera());
-		winSprite = new Sprite(x, y, mWinTextureRegion);
-		failSprite = new Sprite(x, y, mFailTextureRegion);
-		mResultScene.attachChild(winSprite);
-		mResultScene.attachChild(failSprite);
 		mResultScene.setBackgroundEnabled(false);
+		getCharactor("win").onLoadScene(getmCamera(), mResultScene);
+		getCharactor("fail").onLoadScene(getmCamera(), mResultScene);
 
-		winSprite.setVisible(false);
-		failSprite.setVisible(false);
-
-		mMainScene = new Scene();
-		mMainScene.setBackground(new ColorBackground(0.09804f, 0.6274f, 0.8784f));
-		mMainScene.setOnSceneTouchListener(this);
-
-		player.onLoadScene(getmCamera());
 		projectileLL = new LinkedList<Sprite>();
 		targetLL = new LinkedList<Sprite>();
 		projectilesToBeAdded = new LinkedList<Sprite>();
@@ -136,10 +107,7 @@ public class AndEngineSimpleGame extends BaseMGameActivty implements IOnSceneTou
 
 		createSpriteSpawnTimeHandler();
 		mMainScene.registerUpdateHandler(detect);
-
 		getMusic(EnumMusic.BACKGROUNDMISIC).play();
-
-		bgGame.onLoadScene(getmCamera());
 		restart();
 		return mMainScene;
 	}
@@ -165,7 +133,6 @@ public class AndEngineSimpleGame extends BaseMGameActivty implements IOnSceneTou
 
 				if (_target.getX() <= -_target.getWidth()) {
 					removeSprite(_target, targets);
-					// fail();
 					gameMode(GAMEMODESTATUS.FAIL);
 					break;
 				}
@@ -212,7 +179,7 @@ public class AndEngineSimpleGame extends BaseMGameActivty implements IOnSceneTou
 
 			@Override
 			public void run() {
-				mMainScene.detachChild(_sprite);
+				getmMainScene().detachChild(_sprite);
 			}
 		});
 		it.remove();
@@ -231,14 +198,14 @@ public class AndEngineSimpleGame extends BaseMGameActivty implements IOnSceneTou
 	}
 
 	private void shootProjectile(final float pX, final float pY) {
-
-		int offX = (int) (pX - player.getPlayer().getX());
-		int offY = (int) (pY - player.getPlayer().getY());
+		Sprite player = getCharactor("player").getSprite();
+		int offX = (int) (pX - player.getX());
+		int offY = (int) (pY - player.getY());
 		if (offX <= 0) {
 		}
 
-		Sprite projectile = new Sprite(player.getPlayer().getX() + player.getPlayer().getWidth() / 2, player.getPlayer().getY() + player.getPlayer().getHeight(), mProjectileTextureRegion.deepCopy());
-		mMainScene.attachChild(projectile, 1);
+		Sprite projectile = new Sprite(player.getX() + player.getWidth() / 2, player.getY() + player.getHeight(), getCharactor("projectile").getTextureRegion().deepCopy());
+		getmMainScene().attachChild(projectile, 1);
 
 		int realX = (int) (getmCamera().getWidth() + projectile.getWidth() / 2.0f);
 		float ratio = (float) offY / (float) offX;
@@ -257,18 +224,17 @@ public class AndEngineSimpleGame extends BaseMGameActivty implements IOnSceneTou
 		getMusic(EnumMusic.SHOOTINGSHOUND).play();
 	}
 
-	// adds a target at a random location and let it move along the x-axis
 	public void addTarget() {
 		Random rand = new Random();
-
-		int x = (int) getmCamera().getWidth() + mTargetTextureRegion.getWidth();
-		int minY = mTargetTextureRegion.getHeight();
-		int maxY = (int) (getmCamera().getHeight() - mTargetTextureRegion.getHeight());
+		TextureRegion xtarget = getCharactor("target").getTextureRegion();
+		int x = (int) getmCamera().getWidth() + xtarget.getWidth();
+		int minY = xtarget.getHeight();
+		int maxY = (int) (getmCamera().getHeight() - xtarget.getHeight());
 		int rangeY = maxY - minY;
 		int y = rand.nextInt(rangeY) + minY;
 
-		Sprite target = new Sprite(x, y, mTargetTextureRegion.deepCopy());
-		mMainScene.attachChild(target);
+		Sprite target = new Sprite(x, y, getCharactor("target").getTextureRegion().deepCopy());
+		getmMainScene().attachChild(target);
 
 		int minDuration = 2;
 		int maxDuration = 4;
@@ -304,11 +270,10 @@ public class AndEngineSimpleGame extends BaseMGameActivty implements IOnSceneTou
 
 			@Override
 			public void run() {
-				mMainScene.detachChildren();
-				bgGame.restart(mMainScene);
-				player.restart(mMainScene);
+				getmMainScene().detachChildren();
+				getCharactor("player").restart(getmMainScene());
 				// mMainScene.attachChild(player, 1);
-				mMainScene.attachChild(score);
+				getmMainScene().attachChild(score);
 			}
 		});
 
@@ -357,15 +322,15 @@ public class AndEngineSimpleGame extends BaseMGameActivty implements IOnSceneTou
 			// mMainScene.setChildScene(mResultScene, false, true, true);
 			// mEngine.stop();
 		} else if (gamemode == GAMEMODESTATUS.WIN && mEngine.isRunning()) {
-			failSprite.setVisible(false);
-			winSprite.setVisible(true);
-			mMainScene.setChildScene(mResultScene, false, true, true);
+			getCharactor("fail").setVisible(false);
+			getCharactor("win").setVisible(true);
+			getmMainScene().setChildScene(mResultScene, false, true, true);
 			mEngine.stop();
 		} else if (gamemode == GAMEMODESTATUS.PAUSE && runningFlag) {
-			mMainScene.setChildScene(mPauseScene, false, true, true);
+			getmMainScene().setChildScene(mPauseScene, false, true, true);
 			mEngine.stop();
 		} else if (gamemode == GAMEMODESTATUS.UNPAUSE) {
-			mMainScene.clearChildScene();
+			getmMainScene().clearChildScene();
 		}
 	}
 
@@ -399,7 +364,7 @@ public class AndEngineSimpleGame extends BaseMGameActivty implements IOnSceneTou
 		} else if (pKeyCode == KeyEvent.KEYCODE_BACK && pEvent.getAction() == KeyEvent.ACTION_DOWN) {
 
 			if (!mEngine.isRunning() && getMusic(EnumMusic.BACKGROUNDMISIC).isPlaying()) {
-				mMainScene.clearChildScene();
+				getmMainScene().clearChildScene();
 				mEngine.start();
 				restart();
 				return true;
