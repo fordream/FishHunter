@@ -25,23 +25,18 @@ import org.anddev.andengine.opengl.texture.region.TextureRegion;
 
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.os.Bundle;
 import android.view.KeyEvent;
 import android.widget.Toast;
 
 import com.example.game.object.BGGame;
 import com.example.game.object.Player;
 import com.example.game.object.music.BackgroundMusic;
+import com.example.game.object.music.EnumMusic;
 import com.example.game.object.music.ShootingSound;
 import com.example.game.utils.GAMEMODESTATUS;
 
 public class AndEngineSimpleGame extends BaseMGameActivty implements IOnSceneTouchListener {
-
-	private BackgroundMusic backgroundMusic = new BackgroundMusic();
-	private ShootingSound shootingSound = new ShootingSound();
-
-	/**
-	 * 
-	 */
 	private BGGame bgGame = new BGGame();
 	private Player player = new Player();
 	// /////////////////////////////////////////////////////////
@@ -73,6 +68,13 @@ public class AndEngineSimpleGame extends BaseMGameActivty implements IOnSceneTou
 	private final int maxScore = 10;
 
 	@Override
+	protected void onCreate(Bundle pSavedInstanceState) {
+		super.onCreate(pSavedInstanceState);
+		addSounds(EnumMusic.BACKGROUNDMISIC, new BackgroundMusic());
+		addSounds(EnumMusic.SHOOTINGSHOUND, new ShootingSound());
+	}
+
+	@Override
 	public void onLoadResources() {
 		mFontTexture = new BitmapTextureAtlas(256, 256, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
 		BitmapTextureAtlasTextureRegionFactory.setAssetBasePath("gfx/");
@@ -92,8 +94,7 @@ public class AndEngineSimpleGame extends BaseMGameActivty implements IOnSceneTou
 		mEngine.getTextureManager().loadTexture(mFontTexture);
 		mEngine.getFontManager().loadFont(mFont);
 
-		shootingSound.onLoadResources(mEngine, this);
-		backgroundMusic.onLoadResources(mEngine, this);
+		onLoadSoundsResources(mEngine);
 	}
 
 	@Override
@@ -124,30 +125,19 @@ public class AndEngineSimpleGame extends BaseMGameActivty implements IOnSceneTou
 		mMainScene.setBackground(new ColorBackground(0.09804f, 0.6274f, 0.8784f));
 		mMainScene.setOnSceneTouchListener(this);
 
-		// final int PlayerX = (int) (getmCamera().getWidth() -
-		// mPlayerTextureRegion.getWidth()) / 2;
-		// final int PlayerY = (int) ((getmCamera().getHeight() -
-		// mPlayerTextureRegion.getHeight()));
-		// player = new Sprite(PlayerX, PlayerY, mPlayerTextureRegion);
-
 		player.onLoadScene(getmCamera());
 		projectileLL = new LinkedList<Sprite>();
 		targetLL = new LinkedList<Sprite>();
 		projectilesToBeAdded = new LinkedList<Sprite>();
 		TargetsToBeAdded = new LinkedList<Sprite>();
 
-		// settings score to the value of the max score to make sure it appears
-		// correctly on the screen
 		score = new ChangeableText(0, 0, mFont, String.valueOf(maxScore));
-		// repositioning the score later so we can use the score.getWidth()
 		score.setPosition(getmCamera().getWidth() - score.getWidth() - 5, 5);
 
 		createSpriteSpawnTimeHandler();
 		mMainScene.registerUpdateHandler(detect);
 
-		// starting background music
-		backgroundMusic.play();
-		// runningFlag = true;
+		getMusic(EnumMusic.BACKGROUNDMISIC).play();
 
 		bgGame.onLoadScene(getmCamera());
 		restart();
@@ -204,10 +194,8 @@ public class AndEngineSimpleGame extends BaseMGameActivty implements IOnSceneTou
 				}
 			}
 
-			// if max score , then we are done
 			if (hitCount >= maxScore) {
 				gameMode(GAMEMODESTATUS.WIN);
-				// win();
 			}
 
 			projectileLL.addAll(projectilesToBeAdded);
@@ -266,7 +254,7 @@ public class AndEngineSimpleGame extends BaseMGameActivty implements IOnSceneTou
 		projectile.registerEntityModifier(mod.deepCopy());
 
 		projectilesToBeAdded.add(projectile);
-		shootingSound.play();
+		getMusic(EnumMusic.SHOOTINGSHOUND).play();
 	}
 
 	// adds a target at a random location and let it move along the x-axis
@@ -383,24 +371,24 @@ public class AndEngineSimpleGame extends BaseMGameActivty implements IOnSceneTou
 
 	public void pauseMusic() {
 		if (runningFlag)
-			backgroundMusic.pause();
+			getMusic(EnumMusic.BACKGROUNDMISIC).pause();
 	}
 
 	public void resumeMusic() {
 		if (runningFlag)
-			backgroundMusic.resume();
+			getMusic(EnumMusic.BACKGROUNDMISIC).resume();
 	}
 
 	@Override
 	public boolean onKeyDown(final int pKeyCode, final KeyEvent pEvent) {
 		if (pKeyCode == KeyEvent.KEYCODE_MENU && pEvent.getAction() == KeyEvent.ACTION_DOWN) {
-			if (mEngine.isRunning() && backgroundMusic.isPlaying()) {
+			if (mEngine.isRunning() && getMusic(EnumMusic.BACKGROUNDMISIC).isPlaying()) {
 				pauseMusic();
 				pauseFlag = true;
 				gameMode(GAMEMODESTATUS.PAUSE);
 				Toast.makeText(this, "Menu button to resume", Toast.LENGTH_SHORT).show();
 			} else {
-				if (!backgroundMusic.isPlaying()) {
+				if (!getMusic(EnumMusic.BACKGROUNDMISIC).isPlaying()) {
 					gameMode(GAMEMODESTATUS.UNPAUSE);
 					pauseFlag = false;
 					resumeMusic();
@@ -410,7 +398,7 @@ public class AndEngineSimpleGame extends BaseMGameActivty implements IOnSceneTou
 			}
 		} else if (pKeyCode == KeyEvent.KEYCODE_BACK && pEvent.getAction() == KeyEvent.ACTION_DOWN) {
 
-			if (!mEngine.isRunning() && backgroundMusic.isPlaying()) {
+			if (!mEngine.isRunning() && getMusic(EnumMusic.BACKGROUNDMISIC).isPlaying()) {
 				mMainScene.clearChildScene();
 				mEngine.start();
 				restart();
