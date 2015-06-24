@@ -1,12 +1,9 @@
 package com.example.game;
 
-import java.io.IOException;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Random;
 
-import org.anddev.andengine.audio.sound.Sound;
-import org.anddev.andengine.audio.sound.SoundFactory;
 import org.anddev.andengine.engine.handler.IUpdateHandler;
 import org.anddev.andengine.engine.handler.timer.ITimerCallback;
 import org.anddev.andengine.engine.handler.timer.TimerHandler;
@@ -31,35 +28,35 @@ import android.graphics.Typeface;
 import android.view.KeyEvent;
 import android.widget.Toast;
 
+import com.example.game.object.BGGame;
+import com.example.game.object.Player;
 import com.example.game.object.music.BackgroundMusic;
+import com.example.game.object.music.ShootingSound;
 import com.example.game.utils.GAMEMODESTATUS;
 
 public class AndEngineSimpleGame extends BaseMGameActivty implements IOnSceneTouchListener {
-	/**
- * 
- */
-	private BackgroundMusic backgroundMusic = new BackgroundMusic();
-	// private Camera mCamera;
 
-	// This one is for the font
+	private BackgroundMusic backgroundMusic = new BackgroundMusic();
+	private ShootingSound shootingSound = new ShootingSound();
+
+	/**
+	 * 
+	 */
+	private BGGame bgGame = new BGGame();
+	private Player player = new Player();
+	// /////////////////////////////////////////////////////////
+
 	private BitmapTextureAtlas mFontTexture;
 	private Font mFont;
 	private ChangeableText score;
 
-	// this one is for all other textures
-	private BitmapTextureAtlas mBitmapTextureAtlas;
-	private TextureRegion mPlayerTextureRegion;
 	private TextureRegion mProjectileTextureRegion;
 	private TextureRegion mTargetTextureRegion;
 	private TextureRegion mPausedTextureRegion;
 	private TextureRegion mWinTextureRegion;
 	private TextureRegion mFailTextureRegion;
 
-	// the main scene for the game
 	private Scene mMainScene;
-	private Sprite player;
-
-	// win/fail sprites
 	private Sprite winSprite;
 	private Sprite failSprite;
 
@@ -67,8 +64,7 @@ public class AndEngineSimpleGame extends BaseMGameActivty implements IOnSceneTou
 	private LinkedList<Sprite> targetLL;
 	private LinkedList<Sprite> projectilesToBeAdded;
 	private LinkedList<Sprite> TargetsToBeAdded;
-	private Sound shootingSound;
-	// private Music backgroundMusic;
+	// private Sound shootingSound;
 	private boolean runningFlag = false;
 	private boolean pauseFlag = false;
 	private CameraScene mPauseScene;
@@ -78,46 +74,26 @@ public class AndEngineSimpleGame extends BaseMGameActivty implements IOnSceneTou
 
 	@Override
 	public void onLoadResources() {
-		// prepare a container for the image
-		mBitmapTextureAtlas = new BitmapTextureAtlas(512, 512, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
-		// prepare a container for the font
 		mFontTexture = new BitmapTextureAtlas(256, 256, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
-
-		// setting assets path for easy access
 		BitmapTextureAtlasTextureRegionFactory.setAssetBasePath("gfx/");
+		player.onLoadResources(this, getBitmapTextureAtlas());
+		mProjectileTextureRegion = BitmapTextureAtlasTextureRegionFactory.createFromAsset(getBitmapTextureAtlas(), this, "Projectile_01.png", 64, 0);
+		mTargetTextureRegion = BitmapTextureAtlasTextureRegionFactory.createFromAsset(getBitmapTextureAtlas(), this, "target_01.png", 128, 0);
+		mPausedTextureRegion = BitmapTextureAtlasTextureRegionFactory.createFromAsset(getBitmapTextureAtlas(), this, "paused.png", 0, 64);
+		mWinTextureRegion = BitmapTextureAtlasTextureRegionFactory.createFromAsset(getBitmapTextureAtlas(), this, "win.png", 0, 128);
+		mFailTextureRegion = BitmapTextureAtlasTextureRegionFactory.createFromAsset(getBitmapTextureAtlas(), this, "fail.png", 0, 256);
 
-		// loading the image inside the container
-		mPlayerTextureRegion = BitmapTextureAtlasTextureRegionFactory.createFromAsset(this.mBitmapTextureAtlas, this, "player_01.png", 0, 0);
-
-		mProjectileTextureRegion = BitmapTextureAtlasTextureRegionFactory.createFromAsset(this.mBitmapTextureAtlas, this, "Projectile_01.png", 64, 0);
-
-		mTargetTextureRegion = BitmapTextureAtlasTextureRegionFactory.createFromAsset(this.mBitmapTextureAtlas, this, "target_01.png", 128, 0);
-
-		mPausedTextureRegion = BitmapTextureAtlasTextureRegionFactory.createFromAsset(this.mBitmapTextureAtlas, this, "paused.png", 0, 64);
-
-		mWinTextureRegion = BitmapTextureAtlasTextureRegionFactory.createFromAsset(this.mBitmapTextureAtlas, this, "win.png", 0, 128);
-
-		mFailTextureRegion = BitmapTextureAtlasTextureRegionFactory.createFromAsset(this.mBitmapTextureAtlas, this, "fail.png", 0, 256);
-
+		bgGame.onLoadResources(this, getBitmapTextureAtlas());
 		// preparing the font
 		mFont = new Font(mFontTexture, Typeface.create(Typeface.DEFAULT, Typeface.BOLD), 40, true, Color.BLACK);
 
 		// loading textures in the engine
-		mEngine.getTextureManager().loadTexture(mBitmapTextureAtlas);
+		mEngine.getTextureManager().loadTexture(getBitmapTextureAtlas());
 		mEngine.getTextureManager().loadTexture(mFontTexture);
 		mEngine.getFontManager().loadFont(mFont);
 
-		SoundFactory.setAssetBasePath("mfx/");
-		try {
-			shootingSound = SoundFactory.createSoundFromAsset(mEngine.getSoundManager(), this, "pew_pew_lei.wav");
-		} catch (IllegalStateException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
+		shootingSound.onLoadResources(mEngine, this);
 		backgroundMusic.onLoadResources(mEngine, this);
-
 	}
 
 	@Override
@@ -139,25 +115,22 @@ public class AndEngineSimpleGame extends BaseMGameActivty implements IOnSceneTou
 		failSprite = new Sprite(x, y, mFailTextureRegion);
 		mResultScene.attachChild(winSprite);
 		mResultScene.attachChild(failSprite);
-		// makes the scene transparent
 		mResultScene.setBackgroundEnabled(false);
 
 		winSprite.setVisible(false);
 		failSprite.setVisible(false);
 
-		// set background color
 		mMainScene = new Scene();
 		mMainScene.setBackground(new ColorBackground(0.09804f, 0.6274f, 0.8784f));
 		mMainScene.setOnSceneTouchListener(this);
 
-		// set coordinates for the player
-		final int PlayerX = (int) (getmCamera().getWidth() - mPlayerTextureRegion.getWidth()) / 2;
-		final int PlayerY = (int) ((getmCamera().getHeight() - mPlayerTextureRegion.getHeight()));
-		// set the player on the scene
-		player = new Sprite(PlayerX, PlayerY, mPlayerTextureRegion);
-		// player.setScale(2);
+		// final int PlayerX = (int) (getmCamera().getWidth() -
+		// mPlayerTextureRegion.getWidth()) / 2;
+		// final int PlayerY = (int) ((getmCamera().getHeight() -
+		// mPlayerTextureRegion.getHeight()));
+		// player = new Sprite(PlayerX, PlayerY, mPlayerTextureRegion);
 
-		// initializing variables
+		player.onLoadScene(getmCamera());
 		projectileLL = new LinkedList<Sprite>();
 		targetLL = new LinkedList<Sprite>();
 		projectilesToBeAdded = new LinkedList<Sprite>();
@@ -176,6 +149,7 @@ public class AndEngineSimpleGame extends BaseMGameActivty implements IOnSceneTou
 		backgroundMusic.play();
 		// runningFlag = true;
 
+		bgGame.onLoadScene(getmCamera());
 		restart();
 		return mMainScene;
 	}
@@ -184,7 +158,6 @@ public class AndEngineSimpleGame extends BaseMGameActivty implements IOnSceneTou
 	public void onLoadComplete() {
 	}
 
-	// TimerHandler for collision detection and cleaning up
 	IUpdateHandler detect = new IUpdateHandler() {
 		@Override
 		public void reset() {
@@ -197,12 +170,9 @@ public class AndEngineSimpleGame extends BaseMGameActivty implements IOnSceneTou
 			Sprite _target;
 			boolean hit = false;
 
-			// iterating over the targets
 			while (targets.hasNext()) {
 				_target = targets.next();
 
-				// if target passed the left edge of the screen, then remove it
-				// and call a fail
 				if (_target.getX() <= -_target.getWidth()) {
 					removeSprite(_target, targets);
 					// fail();
@@ -211,18 +181,14 @@ public class AndEngineSimpleGame extends BaseMGameActivty implements IOnSceneTou
 				}
 				Iterator<Sprite> projectiles = projectileLL.iterator();
 				Sprite _projectile;
-				// iterating over all the projectiles (bullets)
 				while (projectiles.hasNext()) {
 					_projectile = projectiles.next();
 
-					// in case the projectile left the screen
 					if (_projectile.getX() >= getmCamera().getWidth() || _projectile.getY() >= getmCamera().getHeight() + _projectile.getHeight() || _projectile.getY() <= -_projectile.getHeight()) {
 						removeSprite(_projectile, projectiles);
 						continue;
 					}
 
-					// if the targets collides with a projectile, remove the
-					// projectile and set the hit flag to true
 					if (_target.collidesWith(_projectile)) {
 						removeSprite(_projectile, projectiles);
 						hit = true;
@@ -230,8 +196,6 @@ public class AndEngineSimpleGame extends BaseMGameActivty implements IOnSceneTou
 					}
 				}
 
-				// if a projectile hit the target, remove the target, increment
-				// the hit count, and update the score
 				if (hit) {
 					removeSprite(_target, targets);
 					hit = false;
@@ -246,7 +210,6 @@ public class AndEngineSimpleGame extends BaseMGameActivty implements IOnSceneTou
 				// win();
 			}
 
-			// a work around to avoid ConcurrentAccessException
 			projectileLL.addAll(projectilesToBeAdded);
 			projectilesToBeAdded.clear();
 
@@ -270,7 +233,6 @@ public class AndEngineSimpleGame extends BaseMGameActivty implements IOnSceneTou
 	@Override
 	public boolean onSceneTouchEvent(Scene pScene, TouchEvent pSceneTouchEvent) {
 
-		// if the user tapped the screen
 		if (pSceneTouchEvent.getAction() == TouchEvent.ACTION_DOWN) {
 			final float touchX = pSceneTouchEvent.getX();
 			final float touchY = pSceneTouchEvent.getY();
@@ -280,18 +242,14 @@ public class AndEngineSimpleGame extends BaseMGameActivty implements IOnSceneTou
 		return false;
 	}
 
-	/* shoots a projectile from the player's position along the touched area */
 	private void shootProjectile(final float pX, final float pY) {
 
-		int offX = (int) (pX - player.getX());
-		int offY = (int) (pY - player.getY());
+		int offX = (int) (pX - player.getPlayer().getX());
+		int offY = (int) (pY - player.getPlayer().getY());
 		if (offX <= 0) {
-			// FIXME
-			// return;
 		}
 
-		// position the projectile on the player
-		Sprite projectile = new Sprite(player.getX() + player.getWidth() / 2, player.getY() + player.getHeight(), mProjectileTextureRegion.deepCopy());
+		Sprite projectile = new Sprite(player.getPlayer().getX() + player.getPlayer().getWidth() / 2, player.getPlayer().getY() + player.getPlayer().getHeight(), mProjectileTextureRegion.deepCopy());
 		mMainScene.attachChild(projectile, 1);
 
 		int realX = (int) (getmCamera().getWidth() + projectile.getWidth() / 2.0f);
@@ -304,13 +262,10 @@ public class AndEngineSimpleGame extends BaseMGameActivty implements IOnSceneTou
 		float velocity = 480.0f / 1.0f; // 480 pixels / 1 sec
 		float realMoveDuration = length / velocity;
 
-		// defining a move modifier from the projectile's position to the
-		// calculated one
 		MoveModifier mod = new MoveModifier(realMoveDuration, projectile.getX(), realX, projectile.getY(), realY);
 		projectile.registerEntityModifier(mod.deepCopy());
 
 		projectilesToBeAdded.add(projectile);
-		// plays a shooting sound
 		shootingSound.play();
 	}
 
@@ -339,7 +294,6 @@ public class AndEngineSimpleGame extends BaseMGameActivty implements IOnSceneTou
 
 	}
 
-	// a Time Handler for spawning targets, triggers every 1 second
 	private void createSpriteSpawnTimeHandler() {
 		TimerHandler spriteTimerHandler;
 		float mEffectSpawnDelay = 1f;
@@ -356,21 +310,20 @@ public class AndEngineSimpleGame extends BaseMGameActivty implements IOnSceneTou
 		getEngine().registerUpdateHandler(spriteTimerHandler);
 	}
 
-	/* to restart the game and clear the whole screen */
 	public void restart() {
 
 		runOnUpdateThread(new Runnable() {
 
 			@Override
-			// to safely detach and re-attach the sprites
 			public void run() {
 				mMainScene.detachChildren();
-				mMainScene.attachChild(player, 0);
+				bgGame.restart(mMainScene);
+				player.restart(mMainScene);
+				// mMainScene.attachChild(player, 1);
 				mMainScene.attachChild(score);
 			}
 		});
 
-		// resetting everything
 		hitCount = 0;
 		score.setText(String.valueOf(hitCount));
 		projectileLL.clear();
@@ -380,7 +333,6 @@ public class AndEngineSimpleGame extends BaseMGameActivty implements IOnSceneTou
 	}
 
 	@Override
-	// pauses the music and the game when the game goes to the background
 	protected void onPause() {
 		if (runningFlag) {
 			pauseMusic();
@@ -395,14 +347,11 @@ public class AndEngineSimpleGame extends BaseMGameActivty implements IOnSceneTou
 	@Override
 	public void onResumeGame() {
 		super.onResumeGame();
-		// shows this Toast when coming back to the game
 		if (runningFlag) {
 			if (pauseFlag) {
 				pauseFlag = false;
 				Toast.makeText(this, "Menu button to resume", Toast.LENGTH_SHORT).show();
 			} else {
-				// in case the user clicks the home button while the game on the
-				// resultScene
 				resumeMusic();
 				mEngine.stop();
 			}
@@ -444,7 +393,6 @@ public class AndEngineSimpleGame extends BaseMGameActivty implements IOnSceneTou
 
 	@Override
 	public boolean onKeyDown(final int pKeyCode, final KeyEvent pEvent) {
-		// if menu button is pressed
 		if (pKeyCode == KeyEvent.KEYCODE_MENU && pEvent.getAction() == KeyEvent.ACTION_DOWN) {
 			if (mEngine.isRunning() && backgroundMusic.isPlaying()) {
 				pauseMusic();
@@ -460,7 +408,6 @@ public class AndEngineSimpleGame extends BaseMGameActivty implements IOnSceneTou
 				}
 				return true;
 			}
-			// if back key was pressed
 		} else if (pKeyCode == KeyEvent.KEYCODE_BACK && pEvent.getAction() == KeyEvent.ACTION_DOWN) {
 
 			if (!mEngine.isRunning() && backgroundMusic.isPlaying()) {
@@ -474,6 +421,3 @@ public class AndEngineSimpleGame extends BaseMGameActivty implements IOnSceneTou
 		return super.onKeyDown(pKeyCode, pEvent);
 	}
 }
-
-// for time handler
-// http://www.andengine.org/forums/tutorials/using-timer-s-sprite-spawn-example-t463.html

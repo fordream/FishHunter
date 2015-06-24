@@ -1,24 +1,27 @@
 package com.example.game.object;
 
+import org.anddev.andengine.engine.camera.Camera;
+import org.anddev.andengine.entity.scene.Scene;
 import org.anddev.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlas;
-import org.anddev.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlasTextureRegionFactory;
-import org.anddev.andengine.opengl.texture.region.TextureRegion;
-import org.anddev.andengine.ui.activity.BaseGameActivity;
 
 import android.content.Context;
 
-public class Player {
-	private TextureRegion mPlayerTextureRegion;
+public class Player extends BaseCharactor {
 
-	public Player() {
+	@Override
+	public void onLoadScene(Camera camera) {
+		final int PlayerX = (int) (camera.getWidth() - mPlayerTextureRegion.getWidth()) / 2;
+		final int PlayerY = (int) ((camera.getHeight() - mPlayerTextureRegion.getHeight()));
+		onLoadScene(PlayerX, PlayerY, 1);
 	}
 
+	@Override
 	public void onLoadResources(Context context, BitmapTextureAtlas mBitmapTextureAtlas) {
-		mPlayerTextureRegion = BitmapTextureAtlasTextureRegionFactory.createFromAsset(mBitmapTextureAtlas, context, "Player.png", 0, 0);
+		onLoadResources(context, mBitmapTextureAtlas, "player_01.png", 0, 0);
 	}
 
-	public void onLoadScene(Context context, BitmapTextureAtlas mBitmapTextureAtlas) {
-
+	@Override
+	public void restart(Scene scene) {
+		attachChild(scene, 1);
 	}
-
 }

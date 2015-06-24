@@ -5,6 +5,8 @@ import org.anddev.andengine.engine.camera.Camera;
 import org.anddev.andengine.engine.options.EngineOptions;
 import org.anddev.andengine.engine.options.EngineOptions.ScreenOrientation;
 import org.anddev.andengine.engine.options.resolutionpolicy.RatioResolutionPolicy;
+import org.anddev.andengine.opengl.texture.TextureOptions;
+import org.anddev.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlas;
 import org.anddev.andengine.ui.activity.BaseGameActivity;
 
 import android.view.Display;
@@ -14,6 +16,12 @@ public abstract class BaseMGameActivty extends BaseGameActivity {
 
 	public Camera getmCamera() {
 		return mCamera;
+	}
+
+	private BitmapTextureAtlas bitmapTextureAtlas = new BitmapTextureAtlas(512, 512, TextureOptions.BILINEAR_PREMULTIPLYALPHA);;
+
+	public BitmapTextureAtlas getBitmapTextureAtlas() {
+		return bitmapTextureAtlas;
 	}
 
 	@Override

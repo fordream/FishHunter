@@ -4,9 +4,14 @@ import org.anddev.andengine.engine.Engine;
 
 import android.content.Context;
 
-public class BackgroundMusic extends BaseMusic {
+public class ShootingSound extends BaseMusic {
+
+	public ShootingSound() {
+	}
+
 	@Override
 	public void onLoadResources(Engine mEngine, Context context) {
-		onLoadResources(true, mEngine, context, "background_music.wav", true);
+		onLoadResources(false, mEngine, context, "pew_pew_lei.wav", false);
 	}
+
 }
