@@ -32,8 +32,11 @@ public abstract class BaseCharactor {
 	}
 
 	public final void onLoadScene(float pX, float pY, float scale) {
-		sprite = new Sprite(pX, pY, textureRegion);
-		sprite.setScale(scale);
+
+		if (textureRegion != null) {
+			sprite = new Sprite(pX, pY, textureRegion);
+			sprite.setScale(scale);
+		}
 	}
 
 	public void restart(Scene scene) {
@@ -41,7 +44,8 @@ public abstract class BaseCharactor {
 	}
 
 	public final void attachChild(Scene scene, int index) {
-		scene.attachChild(sprite, index);
+		if (scene != null && sprite != null)
+			scene.attachChild(sprite, index);
 	}
 
 	public void setVisible(boolean isVisible) {

@@ -29,6 +29,7 @@ import org.anddev.andengine.ui.activity.BaseGameActivity;
 import android.view.Display;
 import android.view.KeyEvent;
 
+import com.example.game.object.BGGame;
 import com.example.game.object.Fail;
 import com.example.game.object.FontObject;
 import com.example.game.object.FontTimeObject;
@@ -54,6 +55,7 @@ public class GameActivity extends BaseGameActivity implements IOnSceneTouchListe
 	private Scene mainScene = new Scene();
 	private Projectile projectile = new Projectile();
 	private Player player = new Player();
+	private BGGame bgGame = new BGGame();
 	private Target target = new Target();
 	private Pause pause = new Pause();
 	private Win win = new Win();
@@ -74,7 +76,7 @@ public class GameActivity extends BaseGameActivity implements IOnSceneTouchListe
 		player.onLoadResources(this, getBitmapTextureAtlas());
 		target.onLoadResources(this, getBitmapTextureAtlas());
 		projectile.onLoadResources(this, getBitmapTextureAtlas());
-
+		bgGame.onLoadResources(this, getBitmapTextureAtlas());
 		pause.onLoadResources(this, getBitmapTextureAtlas());
 		win.onLoadResources(this, getBitmapTextureAtlas());
 		fail.onLoadResources(this, getBitmapTextureAtlas());
@@ -94,8 +96,9 @@ public class GameActivity extends BaseGameActivity implements IOnSceneTouchListe
 		mainScene.setOnSceneTouchListener(this);
 		mEngine.registerUpdateHandler(new FPSLogger());
 		// }
-
+		bgGame.onLoadScene(mCamera, null);
 		player.onLoadScene(mCamera, null);
+
 		target.onLoadScene(mCamera, null);
 		projectile.onLoadScene(mCamera, null);
 		pause.onLoadScene(mCamera, null);
@@ -113,6 +116,21 @@ public class GameActivity extends BaseGameActivity implements IOnSceneTouchListe
 		createSpriteSpawnTimeHandler();
 		mainScene.registerUpdateHandler(detect);
 		return mainScene;
+	}
+
+	@Override
+	public void onLoadComplete() {
+		bgGame.attachChild(mainScene, 0);
+		player.attachChild(mainScene, 0);
+		fontObject.attachChild(mainScene);
+		fontTimeObject.attachChild(mainScene);
+		updateTime();
+		pause.attachChild(mainScene, 2);
+		pause.setVisible(false);
+		win.attachChild(mainScene, 2);
+		win.setVisible(false);
+		fail.attachChild(mainScene, 2);
+		fail.setVisible(false);
 	}
 
 	public void removeSprite(final Sprite _sprite, Iterator<Sprite> it) {
@@ -258,20 +276,6 @@ public class GameActivity extends BaseGameActivity implements IOnSceneTouchListe
 		projectile.registerEntityModifier(mod.deepCopy());
 		projectilesToBeAdded.add(projectile);
 		// getMusic(EnumMusic.SHOOTINGSHOUND).play();
-	}
-
-	@Override
-	public void onLoadComplete() {
-		player.attachChild(mainScene, 0);
-		fontObject.attachChild(mainScene);
-		fontTimeObject.attachChild(mainScene);
-		updateTime();
-		pause.attachChild(mainScene, 1);
-		pause.setVisible(false);
-		win.attachChild(mainScene, 1);
-		win.setVisible(false);
-		fail.attachChild(mainScene, 1);
-		fail.setVisible(false);
 	}
 
 	@Override
