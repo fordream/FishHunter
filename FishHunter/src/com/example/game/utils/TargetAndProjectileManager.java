@@ -212,6 +212,7 @@ public abstract class TargetAndProjectileManager {
 		if (playerCenterX == (int) pX && playerCenterY == (int) pY) {
 			return;
 		}
+
 		int realX = 0;
 		int realY = 0;
 
@@ -244,10 +245,10 @@ public abstract class TargetAndProjectileManager {
 		float velocity = 480.0f / 1.0f; // 480 pixels / 1 sec
 		float realMoveDuration = length / velocity;
 
-		if (realMoveDuration < 0.5f) {
-			realMoveDuration = 0.5f;
+		if (realMoveDuration < 1f) {
+			realMoveDuration = 1f;
 		}
-		
+
 		MoveModifier mod = new MoveModifier(realMoveDuration, projectile.getX(), realX, projectile.getY(), realY).deepCopy();
 		final CharactorOfTargetAndProjectile charactorOfTargetAndProjectile = new CharactorOfTargetAndProjectile(projectile, mod);
 		projectile.registerEntityModifier(mod);
