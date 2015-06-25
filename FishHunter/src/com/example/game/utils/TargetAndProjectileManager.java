@@ -19,6 +19,27 @@ import com.example.game.object.Target;
 
 public abstract class TargetAndProjectileManager {
 	public class CharactorOfTargetAndProjectile {
+
+		private int hp = 0;
+
+		public int getHp() {
+			return hp;
+		}
+
+		public void setHp(int hp) {
+			this.hp = hp;
+		}
+
+		public int dame = 0;
+
+		public int getDame() {
+			return dame;
+		}
+
+		public void setDame(int dame) {
+			this.dame = dame;
+		}
+
 		private Sprite sprite;
 		private MoveXModifier modifier;
 		private MoveModifier moveModifier;
@@ -38,11 +59,20 @@ public abstract class TargetAndProjectileManager {
 		public CharactorOfTargetAndProjectile(Sprite sprite, MoveXModifier modifier) {
 			this.sprite = sprite;
 			this.modifier = modifier;
+
+			randomHpAndDame();
+		}
+
+		private void randomHpAndDame() {
+			Random random = new Random();
+			setHp(random.nextInt(10) + 10);
+			setDame(random.nextInt(5) + 1);
 		}
 
 		public CharactorOfTargetAndProjectile(Sprite sprite, MoveModifier mod) {
 			this.sprite = sprite;
 			moveModifier = mod;
+			randomHpAndDame();
 		}
 	}
 
@@ -78,16 +108,20 @@ public abstract class TargetAndProjectileManager {
 		boolean hit = false;
 
 		while (targets.hasNext()) {
-			_target = targets.next().getSprite();
+			CharactorOfTargetAndProjectile charactorOftargert = targets.next();
+			int dame = charactorOftargert.getDame();
+			_target = charactorOftargert.getSprite();
 
 			if (_target.getX() <= -_target.getWidth()) {
 				removeSprite(_target, targets);
 				break;
 			}
+			
 			Iterator<CharactorOfTargetAndProjectile> projectiles = projectileLL.iterator();
 			Sprite _projectile;
 			while (projectiles.hasNext()) {
-				_projectile = projectiles.next().getSprite();
+				CharactorOfTargetAndProjectile charactorOfprojectile = projectiles.next();
+				_projectile = charactorOfprojectile.getSprite();
 
 				if (_projectile.getX() >= mCamera.getWidth() || _projectile.getY() >= mCamera.getHeight() + _projectile.getHeight() || _projectile.getY() <= -_projectile.getHeight()) {
 					removeSprite(_projectile, projectiles);
@@ -95,8 +129,12 @@ public abstract class TargetAndProjectileManager {
 				}
 
 				if (_target.collidesWith(_projectile)) {
-					removeSprite(_projectile, projectiles);
-					hit = true;
+					charactorOfprojectile.setHp(charactorOfprojectile.getHp() - dame);
+					if (charactorOfprojectile.getHp() <= 0) {
+						removeSprite(_projectile, projectiles);
+						hit = true;
+					}
+
 					break;
 				}
 			}

@@ -1,5 +1,7 @@
 package com.example.game.object;
 
+import java.util.Random;
+
 import org.anddev.andengine.engine.camera.Camera;
 import org.anddev.andengine.entity.scene.CameraScene;
 import org.anddev.andengine.entity.scene.Scene;
@@ -11,6 +13,7 @@ import org.anddev.andengine.opengl.texture.region.TextureRegion;
 import android.content.Context;
 
 public abstract class BaseCharactor {
+
 	protected TextureRegion textureRegion;
 	protected Sprite sprite;
 

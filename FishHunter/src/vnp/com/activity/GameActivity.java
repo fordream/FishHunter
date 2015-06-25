@@ -82,8 +82,6 @@ public class GameActivity extends BaseGameActivity implements IOnSceneTouchListe
 	public void onLoadResources() {
 		BitmapTextureAtlasTextureRegionFactory.setAssetBasePath("gfx/");
 		player.onLoadResources(this, getBitmapTextureAtlas());
-		// target.onLoadResources(this, getBitmapTextureAtlas());
-		// projectile.onLoadResources(this, getBitmapTextureAtlas());
 
 		targetAndProjectileManager.onLoadResources(this, getBitmapTextureAtlas());
 		bgGame.onLoadResources(this, getBitmapTextureAtlas());
@@ -101,11 +99,9 @@ public class GameActivity extends BaseGameActivity implements IOnSceneTouchListe
 		/**
 		 * create main scene
 		 */
-		// if (mainScene == null) {
 		mainScene.setBackground(new ColorBackground(0.09804f, 0.6274f, 0.8784f));
 		mainScene.setOnSceneTouchListener(this);
 		mEngine.registerUpdateHandler(new FPSLogger());
-		// }
 		bgGame.onLoadScene(mCamera, null);
 		player.onLoadScene(mCamera, null);
 		targetAndProjectileManager.onLoadScene(mCamera);
@@ -122,7 +118,6 @@ public class GameActivity extends BaseGameActivity implements IOnSceneTouchListe
 
 		fontTimeObject.onLoadScene(mCamera, 1000);
 
-		// startGame();
 		createSpriteSpawnTimeHandler();
 		mainScene.registerUpdateHandler(detect);
 		return mainScene;
@@ -238,6 +233,7 @@ public class GameActivity extends BaseGameActivity implements IOnSceneTouchListe
 			gamemodestatus = GAMEMODESTATUS.PAUSE;
 			updateMode();
 		}
+
 		super.onPauseGame();
 	}
 
