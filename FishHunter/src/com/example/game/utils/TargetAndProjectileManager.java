@@ -208,30 +208,47 @@ public abstract class TargetAndProjectileManager {
 		TextureRegion region = this.projectile.getTextureRegion().deepCopy();
 		int playerCenterX = (int) (player.getX() + player.getWidth() / 2);
 		int playerCenterY = (int) (player.getY() + player.getHeight() / 2);
+
+		if (playerCenterX == (int) pX && playerCenterY == (int) pY) {
+			return;
+		}
+		int realX = 0;
+		int realY = 0;
+
+		if (playerCenterX == (int) pX) {
+			realX = playerCenterX;
+			realY = (int) ((playerCenterY - (int) pY) < 0 ? -region.getHeight() : (mCamera.getHeight() + region.getHeight()));
+		} else if (playerCenterY == (int) pY) {
+			realY = playerCenterY;
+			realX = (int) ((playerCenterX - (int) pX) < 0 ? (mCamera.getWidth() + region.getWidth()) : -region.getWidth());
+		} else {
+			float a = ((float) playerCenterY - pY) / ((float) playerCenterX - pX);
+			float b = (float) playerCenterY - a * ((float) playerCenterX);
+
+			if ((pX - (float) playerCenterX) > 0) {
+				realX = (int) (mCamera.getWidth() + region.getWidth());
+			} else {
+				realX = -region.getWidth();
+			}
+
+			realY = (int) (a * realX + b);
+		}
+
 		final Sprite projectile = new Sprite(playerCenterX - region.getWidth() / 2, playerCenterY - region.getHeight() / 2, region);
 		mainScene.attachChild(projectile, 1);
-
-		int dX = (int) (pX - playerCenterX);
-		int dY = (int) (pY - playerCenterY);
-
-		int realX = (int) (mCamera.getWidth() + projectile.getWidth() / 2.0f);
-		float ratio = (float) dY / (float) dX;
-		int realY = (int) ((realX * ratio) + projectile.getY());
 
 		int offRealX = (int) (realX - projectile.getX());
 		int offRealY = (int) (realY - projectile.getY());
 
-		if (offRealY < mCamera.getHeight()) {
-			offRealY = (int) (offRealY - mCamera.getHeight());
-		}
 		float length = (float) Math.sqrt((offRealX * offRealX) + (offRealY * offRealY));
 		float velocity = 480.0f / 1.0f; // 480 pixels / 1 sec
 		float realMoveDuration = length / velocity;
 
-		// MoveModifier mod = new MoveModifier(realMoveDuration,
-		// projectile.getX(), realX, projectile.getY(), realY).deepCopy();
-		realMoveDuration = 1;
-		MoveModifier mod = new MoveModifier(realMoveDuration, projectile.getX(), pX, projectile.getY(), pY).deepCopy();
+		if (realMoveDuration < 0.5f) {
+			realMoveDuration = 0.5f;
+		}
+		
+		MoveModifier mod = new MoveModifier(realMoveDuration, projectile.getX(), realX, projectile.getY(), realY).deepCopy();
 		final CharactorOfTargetAndProjectile charactorOfTargetAndProjectile = new CharactorOfTargetAndProjectile(projectile, mod);
 		projectile.registerEntityModifier(mod);
 
