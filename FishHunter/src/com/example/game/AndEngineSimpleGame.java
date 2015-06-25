@@ -18,12 +18,15 @@ import org.anddev.andengine.opengl.font.Font;
 import org.anddev.andengine.opengl.texture.TextureOptions;
 import org.anddev.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlas;
 import org.anddev.andengine.opengl.texture.region.TextureRegion;
+
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.widget.Toast;
+
 import com.example.game.object.Fail;
+import com.example.game.object.FontObject;
 import com.example.game.object.Pause;
 import com.example.game.object.Player;
 import com.example.game.object.Projectile;
@@ -35,11 +38,7 @@ import com.example.game.object.music.ShootingSound;
 import com.example.game.utils.GAMEMODESTATUS;
 
 public class AndEngineSimpleGame extends BaseMGameActivty {
-
-	private BitmapTextureAtlas mFontTexture;
-	private Font mFont;
-	private ChangeableText score;
-
+	private FontObject fontObject = new FontObject();
 	private LinkedList<Sprite> projectileLL;
 	private LinkedList<Sprite> targetLL;
 	private LinkedList<Sprite> projectilesToBeAdded = new LinkedList<Sprite>();
@@ -75,18 +74,12 @@ public class AndEngineSimpleGame extends BaseMGameActivty {
 	@Override
 	public void onLoadResources() {
 		super.onLoadResources();
-
-		mFontTexture = new BitmapTextureAtlas(256, 256, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
-		mFont = new Font(mFontTexture, Typeface.create(Typeface.DEFAULT, Typeface.BOLD), 40, true, Color.BLACK);
-		mEngine.getTextureManager().loadTexture(mFontTexture);
-		mEngine.getFontManager().loadFont(mFont);
-
+		fontObject.onLoadResources(mEngine);
 	}
 
 	@Override
 	public Scene onLoadScene() {
 		Scene mMainScene = super.onLoadScene();
-		getCharactor("player").onLoadScene(getmCamera(), null);
 
 		mPauseScene = new CameraScene(getmCamera());
 		mPauseScene.setBackgroundEnabled(false);
@@ -96,14 +89,13 @@ public class AndEngineSimpleGame extends BaseMGameActivty {
 		mResultScene.setBackgroundEnabled(false);
 		getCharactor("win").onLoadScene(getmCamera(), mResultScene);
 		getCharactor("fail").onLoadScene(getmCamera(), mResultScene);
-
+		getCharactor("player").onLoadScene(getmCamera(), null);
 		projectileLL = new LinkedList<Sprite>();
 		targetLL = new LinkedList<Sprite>();
 		projectilesToBeAdded = new LinkedList<Sprite>();
 		TargetsToBeAdded = new LinkedList<Sprite>();
 
-		score = new ChangeableText(0, 0, mFont, String.valueOf(maxScore));
-		score.setPosition(getmCamera().getWidth() - score.getWidth() - 5, 5);
+		fontObject.onLoadScene(getmCamera(), maxScore);
 
 		createSpriteSpawnTimeHandler();
 		mMainScene.registerUpdateHandler(detect);
@@ -157,7 +149,7 @@ public class AndEngineSimpleGame extends BaseMGameActivty {
 					removeSprite(_target, targets);
 					hit = false;
 					hitCount++;
-					score.setText(String.valueOf(hitCount));
+					fontObject.getScore().setText(String.valueOf(hitCount));
 				}
 			}
 
@@ -189,9 +181,7 @@ public class AndEngineSimpleGame extends BaseMGameActivty {
 	public boolean onSceneTouchEvent(Scene pScene, TouchEvent pSceneTouchEvent) {
 
 		if (pSceneTouchEvent.getAction() == TouchEvent.ACTION_DOWN) {
-			final float touchX = pSceneTouchEvent.getX();
-			final float touchY = pSceneTouchEvent.getY();
-			shootProjectile(touchX, touchY);
+			shootProjectile(pSceneTouchEvent.getX(), pSceneTouchEvent.getY());
 			return true;
 		}
 		return false;
@@ -272,13 +262,12 @@ public class AndEngineSimpleGame extends BaseMGameActivty {
 			public void run() {
 				getmMainScene().detachChildren();
 				getCharactor("player").restart(getmMainScene());
-				// mMainScene.attachChild(player, 1);
-				getmMainScene().attachChild(score);
+				getmMainScene().attachChild(fontObject.getScore());
 			}
 		});
 
 		hitCount = 0;
-		score.setText(String.valueOf(hitCount));
+		fontObject.getScore().setText(String.valueOf(hitCount));
 		projectileLL.clear();
 		projectilesToBeAdded.clear();
 		TargetsToBeAdded.clear();
