@@ -27,6 +27,7 @@ public abstract class BaseCharactor {
 	public abstract void onLoadResources(Context context, BitmapTextureAtlas mBitmapTextureAtlas);
 
 	public final void onLoadResources(Context context, BitmapTextureAtlas mBitmapTextureAtlas, String file, int pTexturePositionX, int pTexturePositionY) {
+
 		textureRegion = BitmapTextureAtlasTextureRegionFactory.createFromAsset(mBitmapTextureAtlas, context, file, pTexturePositionX, pTexturePositionY);
 	}
 
@@ -47,6 +48,5 @@ public abstract class BaseCharactor {
 		if (sprite != null) {
 			sprite.setVisible(isVisible);
 		}
-
 	}
 }

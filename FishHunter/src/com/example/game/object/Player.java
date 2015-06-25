@@ -23,6 +23,6 @@ public class Player extends BaseCharactor {
 
 	@Override
 	public void restart(Scene scene) {
-		attachChild(scene, 1);
+		attachChild(scene, 0);
 	}
 }

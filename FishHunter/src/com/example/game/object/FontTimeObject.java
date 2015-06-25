@@ -11,7 +11,7 @@ import org.anddev.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlas;
 import android.graphics.Color;
 import android.graphics.Typeface;
 
-public class FontObject {
+public class FontTimeObject {
 	private BitmapTextureAtlas mFontTexture;
 	private Font mFont;
 	private ChangeableText score;
@@ -25,7 +25,7 @@ public class FontObject {
 	}
 
 	public void onLoadResources(Engine mEngine) {
-		mFontTexture = new BitmapTextureAtlas(256, 256, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
+		mFontTexture = new BitmapTextureAtlas(512, 512, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
 		mFont = new Font(mFontTexture, Typeface.create(Typeface.DEFAULT, Typeface.BOLD), 40, true, Color.BLACK);
 		mEngine.getTextureManager().loadTexture(mFontTexture);
 		mEngine.getFontManager().loadFont(mFont);
@@ -33,7 +33,7 @@ public class FontObject {
 
 	public void onLoadScene(Camera camera, int maxScore) {
 		score = new ChangeableText(0, 0, mFont, String.valueOf(maxScore));
-		score.setPosition(camera.getWidth() - score.getWidth() - 5, 5);
+		score.setPosition(5, 5);
 	}
 
 	public void attachChild(Scene mainScene) {

@@ -15,7 +15,7 @@ public class Projectile extends BaseCharactor {
 
 	@Override
 	public void onLoadResources(Context context, BitmapTextureAtlas mBitmapTextureAtlas) {
-		onLoadResources(context, mBitmapTextureAtlas, "Projectile_01.png", 128, 0);
+		onLoadResources(context, mBitmapTextureAtlas, "Projectile_01.png", 256, 0);
 	}
 
 	@Override

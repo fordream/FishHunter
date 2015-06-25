@@ -16,7 +16,10 @@ public class Pause extends BaseCharactor {
 		final int x = (int) (camera.getWidth() / 2 - textureRegion.getWidth() / 2);
 		final int y = (int) (camera.getHeight() / 2 - textureRegion.getHeight() / 2);
 		onLoadScene(x, y, 1);
-		cameraScene.attachChild(sprite);
+
+		if (cameraScene != null) {
+			cameraScene.attachChild(sprite);
+		}
 		// setVisible(false);
 	}
 

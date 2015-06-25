@@ -1,5 +1,7 @@
 package com.example.game;
 
+import vnp.com.activity.GameActivity;
+
 import com.vnp.core.common.CommonAndroid;
 
 import android.app.Activity;
@@ -21,7 +23,7 @@ public class MenuGameActivity extends Activity implements OnClickListener {
 	@Override
 	public void onClick(View v) {
 		if (R.id.play == v.getId()) {
-			startActivity(new Intent(this, AndEngineSimpleGame.class));
+			startActivity(new Intent(this, GameActivity.class));
 		} else if (R.id.moregame == v.getId()) {
 			CommonAndroid.showMarketPublish(this, "Vnp Game");
 		}

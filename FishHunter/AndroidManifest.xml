@@ -30,6 +30,10 @@
             android:label="@string/app_name"
             android:screenOrientation="landscape" >
         </activity>
+        <activity
+            android:name="vnp.com.activity.GameActivity"
+            android:screenOrientation="landscape" >
+        </activity>
     </application>
 
 </manifest>
