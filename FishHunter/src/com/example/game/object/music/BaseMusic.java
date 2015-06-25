@@ -42,6 +42,7 @@ public abstract class BaseMusic {
 			if (((Music) backgroundMusic).isPlaying())
 				((Music) backgroundMusic).pause();
 		} else {
+			
 			// if (((Sound) backgroundMusic).isPlaying())
 			((Sound) backgroundMusic).pause();
 		}

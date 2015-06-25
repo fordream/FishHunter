@@ -4,18 +4,23 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Random;
 
+import org.anddev.andengine.engine.Engine;
 import org.anddev.andengine.engine.camera.Camera;
+import org.anddev.andengine.entity.IEntity;
 import org.anddev.andengine.entity.modifier.MoveModifier;
 import org.anddev.andengine.entity.modifier.MoveXModifier;
 import org.anddev.andengine.entity.scene.Scene;
 import org.anddev.andengine.entity.sprite.Sprite;
 import org.anddev.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlas;
 import org.anddev.andengine.opengl.texture.region.TextureRegion;
+import org.anddev.andengine.util.modifier.IModifier;
+import org.anddev.andengine.util.modifier.IModifier.IModifierListener;
 
 import android.content.Context;
 
 import com.example.game.object.Projectile;
 import com.example.game.object.Target;
+import com.example.game.object.music.ShootingSound;
 
 public abstract class TargetAndProjectileManager {
 	public class CharactorOfTargetAndProjectile {
@@ -76,15 +81,16 @@ public abstract class TargetAndProjectileManager {
 		}
 	}
 
+	private ShootingSound shootingSound = new ShootingSound();
 	private LinkedList<CharactorOfTargetAndProjectile> projectilesToBeAdded = new LinkedList<CharactorOfTargetAndProjectile>();
 	private LinkedList<CharactorOfTargetAndProjectile> TargetsToBeAdded = new LinkedList<CharactorOfTargetAndProjectile>();
-
 	private LinkedList<CharactorOfTargetAndProjectile> projectileLL = new LinkedList<CharactorOfTargetAndProjectile>();
 	private LinkedList<CharactorOfTargetAndProjectile> targetLL = new LinkedList<CharactorOfTargetAndProjectile>();
 
-	public void onLoadResources(Context context, BitmapTextureAtlas bitmapTextureAtlas) {
+	public void onLoadResources(Engine mEngine, Context context, BitmapTextureAtlas bitmapTextureAtlas) {
 		target.onLoadResources(context, bitmapTextureAtlas);
 		projectile.onLoadResources(context, bitmapTextureAtlas);
+		shootingSound.onLoadResources(mEngine, context);
 	}
 
 	public void onLoadScene(Camera mCamera) {
@@ -116,14 +122,14 @@ public abstract class TargetAndProjectileManager {
 				removeSprite(_target, targets);
 				break;
 			}
-			
+
 			Iterator<CharactorOfTargetAndProjectile> projectiles = projectileLL.iterator();
 			Sprite _projectile;
 			while (projectiles.hasNext()) {
 				CharactorOfTargetAndProjectile charactorOfprojectile = projectiles.next();
 				_projectile = charactorOfprojectile.getSprite();
 
-				if (_projectile.getX() >= mCamera.getWidth() || _projectile.getY() >= mCamera.getHeight() + _projectile.getHeight() || _projectile.getY() <= -_projectile.getHeight()) {
+				if (FishUtils.isOutScreen(mCamera, _projectile)) {
 					removeSprite(_projectile, projectiles);
 					continue;
 				}
@@ -142,7 +148,8 @@ public abstract class TargetAndProjectileManager {
 			if (hit) {
 				removeSprite(_target, targets);
 				hit = false;
-				hitCount++;
+				hitCount = hitCount + new Random().nextInt(5) * 3;
+
 				updateHitCount(hitCount);
 			}
 		}
@@ -197,30 +204,38 @@ public abstract class TargetAndProjectileManager {
 		TargetsToBeAdded.add(charactorOfTargetAndProjectile);
 	}
 
-	public void shootProjectile(Sprite player, Scene mainScene, Camera mCamera, final float pX, final float pY) {
-		int offX = (int) (pX - player.getX());
-		int offY = (int) (pY - player.getY());
-		if (offX <= 0) {
-		}
-
-		Sprite projectile = new Sprite(player.getX() + player.getWidth() / 2, player.getY() + player.getHeight(), this.projectile.getTextureRegion().deepCopy());
+	public void shootProjectile(Sprite player, final Scene mainScene, Camera mCamera, final float pX, final float pY) {
+		TextureRegion region = this.projectile.getTextureRegion().deepCopy();
+		int playerCenterX = (int) (player.getX() + player.getWidth() / 2);
+		int playerCenterY = (int) (player.getY() + player.getHeight() / 2);
+		final Sprite projectile = new Sprite(playerCenterX - region.getWidth() / 2, playerCenterY - region.getHeight() / 2, region);
 		mainScene.attachChild(projectile, 1);
 
+		int dX = (int) (pX - playerCenterX);
+		int dY = (int) (pY - playerCenterY);
+
 		int realX = (int) (mCamera.getWidth() + projectile.getWidth() / 2.0f);
-		float ratio = (float) offY / (float) offX;
+		float ratio = (float) dY / (float) dX;
 		int realY = (int) ((realX * ratio) + projectile.getY());
 
 		int offRealX = (int) (realX - projectile.getX());
 		int offRealY = (int) (realY - projectile.getY());
+
+		if (offRealY < mCamera.getHeight()) {
+			offRealY = (int) (offRealY - mCamera.getHeight());
+		}
 		float length = (float) Math.sqrt((offRealX * offRealX) + (offRealY * offRealY));
 		float velocity = 480.0f / 1.0f; // 480 pixels / 1 sec
 		float realMoveDuration = length / velocity;
 
-		MoveModifier mod = new MoveModifier(realMoveDuration, projectile.getX(), realX, projectile.getY(), realY).deepCopy();
+		// MoveModifier mod = new MoveModifier(realMoveDuration,
+		// projectile.getX(), realX, projectile.getY(), realY).deepCopy();
+		realMoveDuration = 1;
+		MoveModifier mod = new MoveModifier(realMoveDuration, projectile.getX(), pX, projectile.getY(), pY).deepCopy();
+		final CharactorOfTargetAndProjectile charactorOfTargetAndProjectile = new CharactorOfTargetAndProjectile(projectile, mod);
 		projectile.registerEntityModifier(mod);
 
-		CharactorOfTargetAndProjectile charactorOfTargetAndProjectile = new CharactorOfTargetAndProjectile(projectile, mod);
 		projectilesToBeAdded.add(charactorOfTargetAndProjectile);
-		// getMusic(EnumMusic.SHOOTINGSHOUND).play();
+		shootingSound.play();
 	}
 }

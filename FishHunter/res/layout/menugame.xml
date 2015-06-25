@@ -22,7 +22,7 @@
             android:layout_width="@dimen/dimen_50dp"
             android:layout_height="@dimen/dimen_50dp"
             android:background="@drawable/xml_sip_btn_login"
-            android:text="Play"
+            android:text="Play"  android:layout_marginRight="@dimen/dimen_5dp"
             android:textColor="@android:color/black"
             android:textSize="@dimen/dimen_10dp"
             android:textStyle="bold" />
@@ -31,7 +31,7 @@
             android:id="@+id/score"
             android:layout_width="@dimen/dimen_50dp"
             android:layout_height="@dimen/dimen_50dp"
-            android:layout_marginLeft="@dimen/dimen_5dp"
+          
             android:layout_marginRight="@dimen/dimen_5dp"
             android:background="@drawable/xml_sip_btn_login"
             android:text="Score"

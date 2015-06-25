@@ -31,12 +31,14 @@ import com.example.game.object.FontTimeObject;
 import com.example.game.object.Pause;
 import com.example.game.object.Player;
 import com.example.game.object.Win;
+import com.example.game.object.music.BackgroundMusic;
 import com.example.game.utils.GAMEMODESTATUS;
 import com.example.game.utils.TargetAndProjectileManager;
 import com.example.game.utils.TargetAndProjectileManager.CharactorOfTargetAndProjectile;
 
 public class GameActivity extends BaseGameActivity implements IOnSceneTouchListener {
 	private GAMEMODESTATUS gamemodestatus = GAMEMODESTATUS.RUN;
+	private BackgroundMusic backgroundMusic = new BackgroundMusic();
 	private long time = 60;
 	private TargetAndProjectileManager targetAndProjectileManager = new TargetAndProjectileManager() {
 
@@ -53,8 +55,8 @@ public class GameActivity extends BaseGameActivity implements IOnSceneTouchListe
 		@Override
 		public void checkWin(int hitCount) {
 			if (hitCount >= 10) {
-				gamemodestatus = GAMEMODESTATUS.WIN;
-				updateMode();
+				// gamemodestatus = GAMEMODESTATUS.WIN;
+				// updateMode();
 			}
 
 		}
@@ -83,7 +85,7 @@ public class GameActivity extends BaseGameActivity implements IOnSceneTouchListe
 		BitmapTextureAtlasTextureRegionFactory.setAssetBasePath("gfx/");
 		player.onLoadResources(this, getBitmapTextureAtlas());
 
-		targetAndProjectileManager.onLoadResources(this, getBitmapTextureAtlas());
+		targetAndProjectileManager.onLoadResources(mEngine, this, getBitmapTextureAtlas());
 		bgGame.onLoadResources(this, getBitmapTextureAtlas());
 		pause.onLoadResources(this, getBitmapTextureAtlas());
 		win.onLoadResources(this, getBitmapTextureAtlas());
@@ -92,6 +94,8 @@ public class GameActivity extends BaseGameActivity implements IOnSceneTouchListe
 		fontObject.onLoadResources(mEngine);
 		fontTimeObject.onLoadResources(mEngine);
 		mEngine.getTextureManager().loadTexture(getBitmapTextureAtlas());
+
+		backgroundMusic.onLoadResources(mEngine, this);
 	}
 
 	@Override
@@ -120,6 +124,7 @@ public class GameActivity extends BaseGameActivity implements IOnSceneTouchListe
 
 		createSpriteSpawnTimeHandler();
 		mainScene.registerUpdateHandler(detect);
+
 		return mainScene;
 	}
 
@@ -136,6 +141,13 @@ public class GameActivity extends BaseGameActivity implements IOnSceneTouchListe
 		win.setVisible(false);
 		fail.attachChild(mainScene, 2);
 		fail.setVisible(false);
+		// backgroundMusic.play();
+	}
+
+	@Override
+	public void onResumeGame() {
+		super.onResumeGame();
+		// backgroundMusic.play();
 	}
 
 	public void removeSprite(final Sprite _sprite, Iterator<CharactorOfTargetAndProjectile> it) {
@@ -232,6 +244,7 @@ public class GameActivity extends BaseGameActivity implements IOnSceneTouchListe
 		if (gamemodestatus == GAMEMODESTATUS.RUN) {
 			gamemodestatus = GAMEMODESTATUS.PAUSE;
 			updateMode();
+			// backgroundMusic.pause();
 		}
 
 		super.onPauseGame();

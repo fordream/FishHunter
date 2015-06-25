@@ -18,6 +18,7 @@ public class MenuGameActivity extends Activity implements OnClickListener {
 		findViewById(R.id.play).setOnClickListener(this);
 		findViewById(R.id.score).setOnClickListener(this);
 		findViewById(R.id.moregame).setOnClickListener(this);
+		findViewById(R.id.score).setVisibility(View.GONE);
 	}
 
 	@Override
