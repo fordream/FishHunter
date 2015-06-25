@@ -32,7 +32,7 @@ public class FontTimeObject {
 	}
 
 	public void onLoadScene(Camera camera, int maxScore) {
-		score = new ChangeableText(0, 0, mFont, String.valueOf(maxScore));
+		score = new ChangeableText(0, 0, mFont, String.valueOf("Time : 60"));
 		score.setPosition(5, 5);
 	}
 
