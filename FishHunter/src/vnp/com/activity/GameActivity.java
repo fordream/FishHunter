@@ -254,7 +254,7 @@ public class GameActivity extends BaseGameActivity implements IOnSceneTouchListe
 		super.onPauseGame();
 	}
 
-	private BitmapTextureAtlas bitmapTextureAtlas = new BitmapTextureAtlas(512, 512, TextureOptions.BILINEAR_PREMULTIPLYALPHA);;
+	private BitmapTextureAtlas bitmapTextureAtlas = new BitmapTextureAtlas(1024, 1024, TextureOptions.BILINEAR_PREMULTIPLYALPHA);;
 
 	public BitmapTextureAtlas getBitmapTextureAtlas() {
 		return bitmapTextureAtlas;

@@ -24,5 +24,4 @@ public class Fail extends BaseCharactor {
 	public void onLoadResources(Context context, BitmapTextureAtlas mBitmapTextureAtlas) {
 		onLoadResources(context, mBitmapTextureAtlas, "fail.png", 0, 256);
 	}
-
 }
