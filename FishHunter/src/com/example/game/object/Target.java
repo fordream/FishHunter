@@ -15,7 +15,6 @@ public class Target extends BaseCharactor {
 
 	@Override
 	public void onLoadResources(Context context, BitmapTextureAtlas mBitmapTextureAtlas) {
-		onLoadResources(context, mBitmapTextureAtlas, "target_01.png", 128, 0);
 	}
 
 	@Override

@@ -88,8 +88,8 @@ public abstract class TargetAndProjectileManager {
 	private LinkedList<CharactorOfTargetAndProjectile> targetLL = new LinkedList<CharactorOfTargetAndProjectile>();
 
 	public void onLoadResources(Engine mEngine, Context context, BitmapTextureAtlas bitmapTextureAtlas) {
-		target.onLoadResources(context, bitmapTextureAtlas);
-		projectile.onLoadResources(context, bitmapTextureAtlas);
+		target.onLoadResources(context, bitmapTextureAtlas, "target_01.png", 128, 0);
+		projectile.onLoadResources(context, bitmapTextureAtlas, "Projectile_01.png", 256, 0);
 		shootingSound.onLoadResources(mEngine, context);
 	}
 

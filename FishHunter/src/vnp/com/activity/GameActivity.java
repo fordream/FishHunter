@@ -85,14 +85,17 @@ public class GameActivity extends BaseGameActivity implements IOnSceneTouchListe
 	@Override
 	public void onLoadResources() {
 		BitmapTextureAtlasTextureRegionFactory.setAssetBasePath("gfx/");
-		player.onLoadResources(this, getBitmapTextureAtlas());
 
-		targetAndProjectileManager.onLoadResources(mEngine, this, getBitmapTextureAtlas());
+		
+
 		bgGame.onLoadResources(this, getBitmapTextureAtlas());
-		pause.onLoadResources(this, getBitmapTextureAtlas());
-		win.onLoadResources(this, getBitmapTextureAtlas());
-		fail.onLoadResources(this, getBitmapTextureAtlas());
+		player.onLoadResources(this, getBitmapTextureAtlas(), "player_01.png", 0, 64);
+		pause.onLoadResources(this, getBitmapTextureAtlas(), "paused.png", 0, 128);
+		win.onLoadResources(this, getBitmapTextureAtlas(), "win.png", 0, 256);
+		fail.onLoadResources(this, getBitmapTextureAtlas(), "fail.png", 0, 512);
 		runningCat.onCreateResources(this, getBitmapTextureAtlas());
+		targetAndProjectileManager.onLoadResources(mEngine, this, getBitmapTextureAtlas());
+		
 		fontObject.onLoadResources(mEngine);
 		fontTimeObject.onLoadResources(mEngine);
 		mEngine.getTextureManager().loadTexture(getBitmapTextureAtlas());
