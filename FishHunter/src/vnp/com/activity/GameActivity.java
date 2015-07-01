@@ -30,6 +30,7 @@ import com.example.game.object.FontObject;
 import com.example.game.object.FontTimeObject;
 import com.example.game.object.Pause;
 import com.example.game.object.Player;
+import com.example.game.object.RunningCat;
 import com.example.game.object.Win;
 import com.example.game.object.music.BackgroundMusic;
 import com.example.game.utils.GAMEMODESTATUS;
@@ -70,6 +71,7 @@ public class GameActivity extends BaseGameActivity implements IOnSceneTouchListe
 	private Pause pause = new Pause();
 	private Win win = new Win();
 	private Fail fail = new Fail();
+	private RunningCat runningCat = new RunningCat();
 	private Camera mCamera = new Camera(0, 0, 960, 640);
 
 	@Override
@@ -90,7 +92,7 @@ public class GameActivity extends BaseGameActivity implements IOnSceneTouchListe
 		pause.onLoadResources(this, getBitmapTextureAtlas());
 		win.onLoadResources(this, getBitmapTextureAtlas());
 		fail.onLoadResources(this, getBitmapTextureAtlas());
-
+		runningCat.onCreateResources(this, getBitmapTextureAtlas());
 		fontObject.onLoadResources(mEngine);
 		fontTimeObject.onLoadResources(mEngine);
 		mEngine.getTextureManager().loadTexture(getBitmapTextureAtlas());
@@ -121,7 +123,7 @@ public class GameActivity extends BaseGameActivity implements IOnSceneTouchListe
 		fontObject.getScore().setText(String.valueOf(0));
 
 		fontTimeObject.onLoadScene(mCamera, 1000);
-
+		runningCat.onCreateScene(mainScene);
 		createSpriteSpawnTimeHandler();
 		mainScene.registerUpdateHandler(detect);
 
@@ -141,6 +143,8 @@ public class GameActivity extends BaseGameActivity implements IOnSceneTouchListe
 		win.setVisible(false);
 		fail.attachChild(mainScene, 2);
 		fail.setVisible(false);
+
+		runningCat.onloadSucess(mainScene);
 		// backgroundMusic.play();
 	}
 
