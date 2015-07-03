@@ -40,7 +40,7 @@ import com.example.game.utils.TargetAndProjectileManager.CharactorOfTargetAndPro
 public class GameActivity extends BaseGameActivity implements IOnSceneTouchListener {
 	private GAMEMODESTATUS gamemodestatus = GAMEMODESTATUS.RUN;
 	private BackgroundMusic backgroundMusic = new BackgroundMusic();
-	private long time = 60;
+	private long time = 10;
 	private TargetAndProjectileManager targetAndProjectileManager = new TargetAndProjectileManager() {
 
 		@Override
@@ -86,21 +86,26 @@ public class GameActivity extends BaseGameActivity implements IOnSceneTouchListe
 	public void onLoadResources() {
 		BitmapTextureAtlasTextureRegionFactory.setAssetBasePath("gfx/");
 
-		
-
 		bgGame.onLoadResources(this, getBitmapTextureAtlas());
 		player.onLoadResources(this, getBitmapTextureAtlas(), "player_01.png", 0, 64);
 		pause.onLoadResources(this, getBitmapTextureAtlas(), "paused.png", 0, 128);
 		win.onLoadResources(this, getBitmapTextureAtlas(), "win.png", 0, 256);
 		fail.onLoadResources(this, getBitmapTextureAtlas(), "fail.png", 0, 512);
-		runningCat.onCreateResources(this, getBitmapTextureAtlas());
+
+		BitmapTextureAtlas atlas = new BitmapTextureAtlas(1024, 1024, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
+		runningCat.onCreateResources(this, atlas);
 		targetAndProjectileManager.onLoadResources(mEngine, this, getBitmapTextureAtlas());
-		
+
 		fontObject.onLoadResources(mEngine);
 		fontTimeObject.onLoadResources(mEngine);
 		mEngine.getTextureManager().loadTexture(getBitmapTextureAtlas());
-
+		mEngine.getTextureManager().loadTexture(atlas);
 		backgroundMusic.onLoadResources(mEngine, this);
+	}
+
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
 	}
 
 	@Override
@@ -148,13 +153,11 @@ public class GameActivity extends BaseGameActivity implements IOnSceneTouchListe
 		fail.setVisible(false);
 
 		runningCat.onloadSucess(mainScene);
-		// backgroundMusic.play();
 	}
 
 	@Override
 	public void onResumeGame() {
 		super.onResumeGame();
-		// backgroundMusic.play();
 	}
 
 	public void removeSprite(final Sprite _sprite, Iterator<CharactorOfTargetAndProjectile> it) {
@@ -257,7 +260,7 @@ public class GameActivity extends BaseGameActivity implements IOnSceneTouchListe
 		super.onPauseGame();
 	}
 
-	private BitmapTextureAtlas bitmapTextureAtlas = new BitmapTextureAtlas(1024, 1024, TextureOptions.BILINEAR_PREMULTIPLYALPHA);;
+	private BitmapTextureAtlas bitmapTextureAtlas = new BitmapTextureAtlas(1024, 1024, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
 
 	public BitmapTextureAtlas getBitmapTextureAtlas() {
 		return bitmapTextureAtlas;

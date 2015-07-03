@@ -13,15 +13,15 @@ public class RunningCat {
 	private AnimatedSprite sprCat;
 
 	public void onCreateResources(Context context, BitmapTextureAtlas textureManager) {
-		//regCat = BitmapTextureAtlasTextureRegionFactory.createTiledFromAsset(textureManager, context, "runningcat.png", 0, 0, 2, 4);
+		regCat = BitmapTextureAtlasTextureRegionFactory.createTiledFromAsset(textureManager, context, "Projectile_02.png", 0, 0, 2, 1);
 	}
 
 	public void onCreateScene(Scene scene) {
-		//sprCat = new AnimatedSprite(0, 0, regCat);
+		sprCat = new AnimatedSprite(0, 0, regCat);
 	}
 
 	public void onloadSucess(Scene scene) {
-//		scene.attachChild(sprCat, 1000);
-	//	sprCat.animate(100);
+		scene.attachChild(sprCat,1);
+		sprCat.animate(100);
 	}
 }
