@@ -31,6 +31,7 @@ import com.example.game.object.FontTimeObject;
 import com.example.game.object.Pause;
 import com.example.game.object.Player;
 import com.example.game.object.RunningCat;
+import com.example.game.object.TargetAnimationCat;
 import com.example.game.object.Win;
 import com.example.game.object.music.BackgroundMusic;
 import com.example.game.utils.GAMEMODESTATUS;
@@ -73,6 +74,7 @@ public class GameActivity extends BaseGameActivity implements
 	private Pause pause = new Pause();
 	private Win win = new Win();
 	private Fail fail = new Fail();
+	private TargetAnimationCat targetAnimationCat = new TargetAnimationCat();
 	private RunningCat runningCat = new RunningCat();
 	private Camera mCamera = new Camera(0, 0, 960, 640);
 
@@ -101,6 +103,11 @@ public class GameActivity extends BaseGameActivity implements
 		BitmapTextureAtlas atlas = new BitmapTextureAtlas(1024, 1024,
 				TextureOptions.BILINEAR_PREMULTIPLYALPHA);
 		runningCat.onCreateResources(this, atlas);
+
+		BitmapTextureAtlas atlas2 = new BitmapTextureAtlas(300, 300,
+				TextureOptions.BILINEAR_PREMULTIPLYALPHA);
+		targetAnimationCat.onCreateResources(this, atlas2);
+
 		targetAndProjectileManager.onLoadResources(mEngine, this,
 				getBitmapTextureAtlas());
 
@@ -108,6 +115,8 @@ public class GameActivity extends BaseGameActivity implements
 		fontTimeObject.onLoadResources(mEngine);
 		mEngine.getTextureManager().loadTexture(getBitmapTextureAtlas());
 		mEngine.getTextureManager().loadTexture(atlas);
+		mEngine.getTextureManager().loadTexture(atlas2);
+
 		backgroundMusic.onLoadResources(mEngine, this);
 	}
 
@@ -141,6 +150,7 @@ public class GameActivity extends BaseGameActivity implements
 
 		fontTimeObject.onLoadScene(mCamera, 1000);
 		runningCat.onCreateScene(mainScene);
+		targetAnimationCat.onCreateScene(mainScene);
 		createSpriteSpawnTimeHandler();
 		mainScene.registerUpdateHandler(detect);
 
@@ -200,7 +210,7 @@ public class GameActivity extends BaseGameActivity implements
 					public void onTimePassed(TimerHandler pTimerHandler) {
 						if (gamemodestatus == GAMEMODESTATUS.RUN) {
 							targetAndProjectileManager.addTarget(mCamera,
-									mainScene, runningCat);
+									mainScene, targetAnimationCat);
 							time--;
 							updateTime();
 
