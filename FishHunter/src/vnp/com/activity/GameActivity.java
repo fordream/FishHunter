@@ -104,7 +104,7 @@ public class GameActivity extends BaseGameActivity implements
 				TextureOptions.BILINEAR_PREMULTIPLYALPHA);
 		runningCat.onCreateResources(this, atlas);
 
-		BitmapTextureAtlas atlas2 = new BitmapTextureAtlas(300, 300,
+		BitmapTextureAtlas atlas2 = new BitmapTextureAtlas(1024, 1024,
 				TextureOptions.BILINEAR_PREMULTIPLYALPHA);
 		targetAnimationCat.onCreateResources(this, atlas2);
 

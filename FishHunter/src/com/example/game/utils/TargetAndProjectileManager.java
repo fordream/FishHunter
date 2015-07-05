@@ -204,7 +204,7 @@ public abstract class TargetAndProjectileManager {
 		// Sprite target = new Sprite(x, y, this.target.getTextureRegion()
 		// .deepCopy());
 		AnimatedSprite target = new AnimatedSprite(x, y, runningCat.getRegCat());
-		target.animate(100);
+		target.animate(300);
 		mainScene.attachChild(target);
 
 		int minDuration = 2;
@@ -266,7 +266,7 @@ public abstract class TargetAndProjectileManager {
 		AnimatedSprite projectile = new AnimatedSprite(playerCenterX
 				- region.getWidth() / 2,
 				playerCenterY - region.getHeight() / 2, region);
-		projectile.animate(100);
+		projectile.animate(300);
 		mainScene.attachChild(projectile, 1);
 
 		int offRealX = (int) (realX - projectile.getX());
