@@ -12,8 +12,14 @@ public class RunningCat {
 	private TiledTextureRegion regCat;
 	private AnimatedSprite sprCat;
 
-	public void onCreateResources(Context context, BitmapTextureAtlas textureManager) {
-		regCat = BitmapTextureAtlasTextureRegionFactory.createTiledFromAsset(textureManager, context, "Projectile_02.png", 0, 0, 2, 1);
+	public void onCreateResources(Context context,
+			BitmapTextureAtlas textureManager) {
+		regCat = BitmapTextureAtlasTextureRegionFactory.createTiledFromAsset(
+				textureManager, context, "Projectile_02.png", 0, 0, 2, 1);
+	}
+
+	public TiledTextureRegion getRegCat() {
+		return regCat.deepCopy();
 	}
 
 	public void onCreateScene(Scene scene) {
@@ -21,7 +27,11 @@ public class RunningCat {
 	}
 
 	public void onloadSucess(Scene scene) {
-		scene.attachChild(sprCat,1);
+		scene.attachChild(sprCat, 1);
 		sprCat.animate(100);
+	}
+
+	public AnimatedSprite getSprCat() {
+		return sprCat;
 	}
 }

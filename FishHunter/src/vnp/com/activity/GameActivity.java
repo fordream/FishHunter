@@ -13,7 +13,7 @@ import org.anddev.andengine.engine.options.resolutionpolicy.RatioResolutionPolic
 import org.anddev.andengine.entity.scene.Scene;
 import org.anddev.andengine.entity.scene.Scene.IOnSceneTouchListener;
 import org.anddev.andengine.entity.scene.background.ColorBackground;
-import org.anddev.andengine.entity.sprite.Sprite;
+import org.anddev.andengine.entity.sprite.AnimatedSprite;
 import org.anddev.andengine.entity.util.FPSLogger;
 import org.anddev.andengine.input.touch.TouchEvent;
 import org.anddev.andengine.opengl.texture.TextureOptions;
@@ -37,14 +37,16 @@ import com.example.game.utils.GAMEMODESTATUS;
 import com.example.game.utils.TargetAndProjectileManager;
 import com.example.game.utils.TargetAndProjectileManager.CharactorOfTargetAndProjectile;
 
-public class GameActivity extends BaseGameActivity implements IOnSceneTouchListener {
+public class GameActivity extends BaseGameActivity implements
+		IOnSceneTouchListener {
 	private GAMEMODESTATUS gamemodestatus = GAMEMODESTATUS.RUN;
 	private BackgroundMusic backgroundMusic = new BackgroundMusic();
 	private long time = 10;
 	private TargetAndProjectileManager targetAndProjectileManager = new TargetAndProjectileManager() {
 
 		@Override
-		public void removeSprite(Sprite _sprite, Iterator<CharactorOfTargetAndProjectile> it) {
+		public void removeSprite(AnimatedSprite _sprite,
+				Iterator<CharactorOfTargetAndProjectile> it) {
 			GameActivity.this.removeSprite(_sprite, it);
 		}
 
@@ -79,7 +81,9 @@ public class GameActivity extends BaseGameActivity implements IOnSceneTouchListe
 		final Display display = getWindowManager().getDefaultDisplay();
 		int cameraWidth = display.getWidth();
 		int cameraHeight = display.getHeight();
-		return new Engine(new EngineOptions(true, ScreenOrientation.LANDSCAPE, new RatioResolutionPolicy(cameraWidth, cameraHeight), mCamera).setNeedsSound(true).setNeedsMusic(true));
+		return new Engine(new EngineOptions(true, ScreenOrientation.LANDSCAPE,
+				new RatioResolutionPolicy(cameraWidth, cameraHeight), mCamera)
+				.setNeedsSound(true).setNeedsMusic(true));
 	}
 
 	@Override
@@ -87,14 +91,18 @@ public class GameActivity extends BaseGameActivity implements IOnSceneTouchListe
 		BitmapTextureAtlasTextureRegionFactory.setAssetBasePath("gfx/");
 
 		bgGame.onLoadResources(this, getBitmapTextureAtlas());
-		player.onLoadResources(this, getBitmapTextureAtlas(), "player_01.png", 0, 64);
-		pause.onLoadResources(this, getBitmapTextureAtlas(), "paused.png", 0, 128);
+		player.onLoadResources(this, getBitmapTextureAtlas(), "player_01.png",
+				0, 64);
+		pause.onLoadResources(this, getBitmapTextureAtlas(), "paused.png", 0,
+				128);
 		win.onLoadResources(this, getBitmapTextureAtlas(), "win.png", 0, 256);
 		fail.onLoadResources(this, getBitmapTextureAtlas(), "fail.png", 0, 512);
 
-		BitmapTextureAtlas atlas = new BitmapTextureAtlas(1024, 1024, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
+		BitmapTextureAtlas atlas = new BitmapTextureAtlas(1024, 1024,
+				TextureOptions.BILINEAR_PREMULTIPLYALPHA);
 		runningCat.onCreateResources(this, atlas);
-		targetAndProjectileManager.onLoadResources(mEngine, this, getBitmapTextureAtlas());
+		targetAndProjectileManager.onLoadResources(mEngine, this,
+				getBitmapTextureAtlas());
 
 		fontObject.onLoadResources(mEngine);
 		fontTimeObject.onLoadResources(mEngine);
@@ -113,7 +121,8 @@ public class GameActivity extends BaseGameActivity implements IOnSceneTouchListe
 		/**
 		 * create main scene
 		 */
-		mainScene.setBackground(new ColorBackground(0.09804f, 0.6274f, 0.8784f));
+		mainScene
+				.setBackground(new ColorBackground(0.09804f, 0.6274f, 0.8784f));
 		mainScene.setOnSceneTouchListener(this);
 		mEngine.registerUpdateHandler(new FPSLogger());
 		bgGame.onLoadScene(mCamera, null);
@@ -160,7 +169,8 @@ public class GameActivity extends BaseGameActivity implements IOnSceneTouchListe
 		super.onResumeGame();
 	}
 
-	public void removeSprite(final Sprite _sprite, Iterator<CharactorOfTargetAndProjectile> it) {
+	public void removeSprite(final AnimatedSprite _sprite,
+			Iterator<CharactorOfTargetAndProjectile> it) {
 		runOnUpdateThread(new Runnable() {
 			@Override
 			public void run() {
@@ -184,21 +194,23 @@ public class GameActivity extends BaseGameActivity implements IOnSceneTouchListe
 	private void createSpriteSpawnTimeHandler() {
 		float mEffectSpawnDelay = 1f;
 
-		TimerHandler spriteTimerHandler = new TimerHandler(mEffectSpawnDelay, true, new ITimerCallback() {
-			@Override
-			public void onTimePassed(TimerHandler pTimerHandler) {
-				if (gamemodestatus == GAMEMODESTATUS.RUN) {
-					targetAndProjectileManager.addTarget(mCamera, mainScene);
-					time--;
-					updateTime();
+		TimerHandler spriteTimerHandler = new TimerHandler(mEffectSpawnDelay,
+				true, new ITimerCallback() {
+					@Override
+					public void onTimePassed(TimerHandler pTimerHandler) {
+						if (gamemodestatus == GAMEMODESTATUS.RUN) {
+							targetAndProjectileManager.addTarget(mCamera,
+									mainScene, runningCat);
+							time--;
+							updateTime();
 
-					if (time == 0) {
-						gamemodestatus = GAMEMODESTATUS.FAIL;
-						updateMode();
+							if (time == 0) {
+								gamemodestatus = GAMEMODESTATUS.FAIL;
+								updateMode();
+							}
+						}
 					}
-				}
-			}
-		});
+				});
 
 		getEngine().registerUpdateHandler(spriteTimerHandler);
 	}
@@ -209,10 +221,14 @@ public class GameActivity extends BaseGameActivity implements IOnSceneTouchListe
 
 	@Override
 	public boolean onSceneTouchEvent(Scene arg0, TouchEvent pSceneTouchEvent) {
-		if (pSceneTouchEvent.getAction() == TouchEvent.ACTION_DOWN && gamemodestatus == GAMEMODESTATUS.RUN) {
-			targetAndProjectileManager.shootProjectile(player.getSprite(), mainScene, mCamera, pSceneTouchEvent.getX(), pSceneTouchEvent.getY());
+		if (pSceneTouchEvent.getAction() == TouchEvent.ACTION_DOWN
+				&& gamemodestatus == GAMEMODESTATUS.RUN) {
+			targetAndProjectileManager.shootProjectile(player.getSprite(),
+					mainScene, mCamera, pSceneTouchEvent.getX(),
+					pSceneTouchEvent.getY(), runningCat);
 			return true;
-		} else if (pSceneTouchEvent.getAction() == TouchEvent.ACTION_DOWN && gamemodestatus == GAMEMODESTATUS.PAUSE) {
+		} else if (pSceneTouchEvent.getAction() == TouchEvent.ACTION_DOWN
+				&& gamemodestatus == GAMEMODESTATUS.PAUSE) {
 			gamemodestatus = GAMEMODESTATUS.RUN;
 			updateMode();
 		}
@@ -222,7 +238,8 @@ public class GameActivity extends BaseGameActivity implements IOnSceneTouchListe
 
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
-		if (keyCode == KeyEvent.KEYCODE_BACK && gamemodestatus == GAMEMODESTATUS.RUN) {
+		if (keyCode == KeyEvent.KEYCODE_BACK
+				&& gamemodestatus == GAMEMODESTATUS.RUN) {
 			gamemodestatus = GAMEMODESTATUS.PAUSE;
 			updateMode();
 			return false;
@@ -260,7 +277,8 @@ public class GameActivity extends BaseGameActivity implements IOnSceneTouchListe
 		super.onPauseGame();
 	}
 
-	private BitmapTextureAtlas bitmapTextureAtlas = new BitmapTextureAtlas(1024, 1024, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
+	private BitmapTextureAtlas bitmapTextureAtlas = new BitmapTextureAtlas(
+			1024, 1024, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
 
 	public BitmapTextureAtlas getBitmapTextureAtlas() {
 		return bitmapTextureAtlas;
