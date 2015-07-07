@@ -13,7 +13,7 @@ public class TargetAnimationCat extends RunningCat {
 	public AnimatedSprite sprCat;
 
 	public void onCreateResources(Context context, BitmapTextureAtlas textureManager) {
-		regCat = BitmapTextureAtlasTextureRegionFactory.createTiledFromAsset(textureManager, context, "fish.png", 0, 0, 1, 2);
+		regCat = BitmapTextureAtlasTextureRegionFactory.createTiledFromAsset(textureManager, context, "diabay.png", 0, 0, 1, 3);
 	}
 
 	public void onCreateScene(Scene scene) {

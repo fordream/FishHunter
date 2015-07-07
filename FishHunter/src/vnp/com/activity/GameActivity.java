@@ -21,10 +21,13 @@ import org.anddev.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlas;
 import org.anddev.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlasTextureRegionFactory;
 import org.anddev.andengine.ui.activity.BaseGameActivity;
 
+import android.os.Handler;
+import android.os.Message;
 import android.view.Display;
 import android.view.KeyEvent;
 
 import com.example.game.object.BGGame;
+import com.example.game.object.Bomber;
 import com.example.game.object.Fail;
 import com.example.game.object.FontObject;
 import com.example.game.object.FontTimeObject;
@@ -38,16 +41,14 @@ import com.example.game.utils.GAMEMODESTATUS;
 import com.example.game.utils.TargetAndProjectileManager;
 import com.example.game.utils.TargetAndProjectileManager.CharactorOfTargetAndProjectile;
 
-public class GameActivity extends BaseGameActivity implements
-		IOnSceneTouchListener {
+public class GameActivity extends BaseGameActivity implements IOnSceneTouchListener {
 	private GAMEMODESTATUS gamemodestatus = GAMEMODESTATUS.RUN;
 	private BackgroundMusic backgroundMusic = new BackgroundMusic();
 	private long time = 10;
 	private TargetAndProjectileManager targetAndProjectileManager = new TargetAndProjectileManager() {
 
 		@Override
-		public void removeSprite(AnimatedSprite _sprite,
-				Iterator<CharactorOfTargetAndProjectile> it) {
+		public void removeSprite(AnimatedSprite _sprite, Iterator<CharactorOfTargetAndProjectile> it) {
 			GameActivity.this.removeSprite(_sprite, it);
 		}
 
@@ -65,6 +66,22 @@ public class GameActivity extends BaseGameActivity implements
 
 		}
 
+		@Override
+		public void addBomber(AnimatedSprite _target) {
+			final AnimatedSprite sprite = new AnimatedSprite(_target.getX(), _target.getY(), bomber.getRegCat());
+			sprite.animate(100);
+			mainScene.attachChild(sprite);
+
+			Message message = new Message();
+			message.obj = sprite;
+			handler.sendMessageDelayed(message, 500);
+		}
+
+	};
+	Handler handler = new Handler() {
+		public void dispatchMessage(Message msg) {
+			removeSprite((AnimatedSprite) msg.obj);
+		};
 	};
 	private FontObject fontObject = new FontObject();
 	private FontTimeObject fontTimeObject = new FontTimeObject();
@@ -74,6 +91,7 @@ public class GameActivity extends BaseGameActivity implements
 	private Pause pause = new Pause();
 	private Win win = new Win();
 	private Fail fail = new Fail();
+	private Bomber bomber = new Bomber();
 	private TargetAnimationCat targetAnimationCat = new TargetAnimationCat();
 	private RunningCat runningCat = new RunningCat();
 	private Camera mCamera = new Camera(0, 0, 960, 640);
@@ -83,9 +101,7 @@ public class GameActivity extends BaseGameActivity implements
 		final Display display = getWindowManager().getDefaultDisplay();
 		int cameraWidth = display.getWidth();
 		int cameraHeight = display.getHeight();
-		return new Engine(new EngineOptions(true, ScreenOrientation.LANDSCAPE,
-				new RatioResolutionPolicy(cameraWidth, cameraHeight), mCamera)
-				.setNeedsSound(true).setNeedsMusic(true));
+		return new Engine(new EngineOptions(true, ScreenOrientation.LANDSCAPE, new RatioResolutionPolicy(cameraWidth, cameraHeight), mCamera).setNeedsSound(true).setNeedsMusic(true));
 	}
 
 	@Override
@@ -93,36 +109,28 @@ public class GameActivity extends BaseGameActivity implements
 		BitmapTextureAtlasTextureRegionFactory.setAssetBasePath("gfx/");
 
 		bgGame.onLoadResources(this, getBitmapTextureAtlas());
-		player.onLoadResources(this, getBitmapTextureAtlas(), "player_01.png",
-				0, 64);
-		pause.onLoadResources(this, getBitmapTextureAtlas(), "paused.png", 0,
-				128);
+		player.onLoadResources(this, getBitmapTextureAtlas(), "player_01.png", 0, 64);
+		pause.onLoadResources(this, getBitmapTextureAtlas(), "paused.png", 0, 128);
 		win.onLoadResources(this, getBitmapTextureAtlas(), "win.png", 0, 256);
 		fail.onLoadResources(this, getBitmapTextureAtlas(), "fail.png", 0, 512);
 
-		BitmapTextureAtlas atlas = new BitmapTextureAtlas(1024, 1024,
-				TextureOptions.BILINEAR_PREMULTIPLYALPHA);
+		BitmapTextureAtlas atlas = new BitmapTextureAtlas(1024, 1024, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
 		runningCat.onCreateResources(this, atlas);
 
-		BitmapTextureAtlas atlas2 = new BitmapTextureAtlas(1024, 1024,
-				TextureOptions.BILINEAR_PREMULTIPLYALPHA);
+		BitmapTextureAtlas atlas3 = new BitmapTextureAtlas(1024, 1024, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
+		bomber.onCreateResources(this, atlas3);
+		BitmapTextureAtlas atlas2 = new BitmapTextureAtlas(1024, 1024, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
 		targetAnimationCat.onCreateResources(this, atlas2);
 
-		targetAndProjectileManager.onLoadResources(mEngine, this,
-				getBitmapTextureAtlas());
+		targetAndProjectileManager.onLoadResources(mEngine, this, getBitmapTextureAtlas());
 
 		fontObject.onLoadResources(mEngine);
 		fontTimeObject.onLoadResources(mEngine);
 		mEngine.getTextureManager().loadTexture(getBitmapTextureAtlas());
 		mEngine.getTextureManager().loadTexture(atlas);
 		mEngine.getTextureManager().loadTexture(atlas2);
-
+		mEngine.getTextureManager().loadTexture(atlas3);
 		backgroundMusic.onLoadResources(mEngine, this);
-	}
-
-	@Override
-	protected void onDestroy() {
-		super.onDestroy();
 	}
 
 	@Override
@@ -130,8 +138,7 @@ public class GameActivity extends BaseGameActivity implements
 		/**
 		 * create main scene
 		 */
-		mainScene
-				.setBackground(new ColorBackground(0.09804f, 0.6274f, 0.8784f));
+		mainScene.setBackground(new ColorBackground(0.09804f, 0.6274f, 0.8784f));
 		mainScene.setOnSceneTouchListener(this);
 		mEngine.registerUpdateHandler(new FPSLogger());
 		bgGame.onLoadScene(mCamera, null);
@@ -150,6 +157,7 @@ public class GameActivity extends BaseGameActivity implements
 
 		fontTimeObject.onLoadScene(mCamera, 1000);
 		runningCat.onCreateScene(mainScene);
+		bomber.onCreateScene(mainScene);
 		targetAnimationCat.onCreateScene(mainScene);
 		createSpriteSpawnTimeHandler();
 		mainScene.registerUpdateHandler(detect);
@@ -179,8 +187,17 @@ public class GameActivity extends BaseGameActivity implements
 		super.onResumeGame();
 	}
 
-	public void removeSprite(final AnimatedSprite _sprite,
-			Iterator<CharactorOfTargetAndProjectile> it) {
+	public void removeSprite(final AnimatedSprite _sprite) {
+		runOnUpdateThread(new Runnable() {
+			@Override
+			public void run() {
+				mainScene.detachChild(_sprite);
+			}
+		});
+
+	}
+
+	public void removeSprite(final AnimatedSprite _sprite, Iterator<CharactorOfTargetAndProjectile> it) {
 		runOnUpdateThread(new Runnable() {
 			@Override
 			public void run() {
@@ -204,23 +221,21 @@ public class GameActivity extends BaseGameActivity implements
 	private void createSpriteSpawnTimeHandler() {
 		float mEffectSpawnDelay = 1f;
 
-		TimerHandler spriteTimerHandler = new TimerHandler(mEffectSpawnDelay,
-				true, new ITimerCallback() {
-					@Override
-					public void onTimePassed(TimerHandler pTimerHandler) {
-						if (gamemodestatus == GAMEMODESTATUS.RUN) {
-							targetAndProjectileManager.addTarget(mCamera,
-									mainScene, targetAnimationCat);
-							time--;
-							updateTime();
+		TimerHandler spriteTimerHandler = new TimerHandler(mEffectSpawnDelay, true, new ITimerCallback() {
+			@Override
+			public void onTimePassed(TimerHandler pTimerHandler) {
+				if (gamemodestatus == GAMEMODESTATUS.RUN) {
+					targetAndProjectileManager.addTarget(mCamera, mainScene, targetAnimationCat);
+					time--;
+					updateTime();
 
-							if (time == 0) {
-								gamemodestatus = GAMEMODESTATUS.FAIL;
-								updateMode();
-							}
-						}
+					if (time == 0) {
+						gamemodestatus = GAMEMODESTATUS.FAIL;
+						updateMode();
 					}
-				});
+				}
+			}
+		});
 
 		getEngine().registerUpdateHandler(spriteTimerHandler);
 	}
@@ -231,14 +246,10 @@ public class GameActivity extends BaseGameActivity implements
 
 	@Override
 	public boolean onSceneTouchEvent(Scene arg0, TouchEvent pSceneTouchEvent) {
-		if (pSceneTouchEvent.getAction() == TouchEvent.ACTION_DOWN
-				&& gamemodestatus == GAMEMODESTATUS.RUN) {
-			targetAndProjectileManager.shootProjectile(player.getSprite(),
-					mainScene, mCamera, pSceneTouchEvent.getX(),
-					pSceneTouchEvent.getY(), runningCat);
+		if (pSceneTouchEvent.getAction() == TouchEvent.ACTION_DOWN && gamemodestatus == GAMEMODESTATUS.RUN) {
+			targetAndProjectileManager.shootProjectile(player.getSprite(), mainScene, mCamera, pSceneTouchEvent.getX(), pSceneTouchEvent.getY(), runningCat);
 			return true;
-		} else if (pSceneTouchEvent.getAction() == TouchEvent.ACTION_DOWN
-				&& gamemodestatus == GAMEMODESTATUS.PAUSE) {
+		} else if (pSceneTouchEvent.getAction() == TouchEvent.ACTION_DOWN && gamemodestatus == GAMEMODESTATUS.PAUSE) {
 			gamemodestatus = GAMEMODESTATUS.RUN;
 			updateMode();
 		}
@@ -248,8 +259,7 @@ public class GameActivity extends BaseGameActivity implements
 
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
-		if (keyCode == KeyEvent.KEYCODE_BACK
-				&& gamemodestatus == GAMEMODESTATUS.RUN) {
+		if (keyCode == KeyEvent.KEYCODE_BACK && gamemodestatus == GAMEMODESTATUS.RUN) {
 			gamemodestatus = GAMEMODESTATUS.PAUSE;
 			updateMode();
 			return false;
@@ -287,8 +297,7 @@ public class GameActivity extends BaseGameActivity implements
 		super.onPauseGame();
 	}
 
-	private BitmapTextureAtlas bitmapTextureAtlas = new BitmapTextureAtlas(
-			1024, 1024, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
+	private BitmapTextureAtlas bitmapTextureAtlas = new BitmapTextureAtlas(1024, 1024, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
 
 	public BitmapTextureAtlas getBitmapTextureAtlas() {
 		return bitmapTextureAtlas;
