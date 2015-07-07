@@ -28,6 +28,7 @@ import android.view.KeyEvent;
 
 import com.example.game.object.BGGame;
 import com.example.game.object.Bomber;
+import com.example.game.object.DataHitCount;
 import com.example.game.object.Fail;
 import com.example.game.object.FontObject;
 import com.example.game.object.FontTimeObject;
@@ -44,7 +45,8 @@ import com.example.game.utils.TargetAndProjectileManager.CharactorOfTargetAndPro
 public class GameActivity extends BaseGameActivity implements IOnSceneTouchListener {
 	private GAMEMODESTATUS gamemodestatus = GAMEMODESTATUS.RUN;
 	private BackgroundMusic backgroundMusic = new BackgroundMusic();
-	private long time = 10;
+	private long time = 60;
+	private int hitCount = 0;
 	private TargetAndProjectileManager targetAndProjectileManager = new TargetAndProjectileManager() {
 
 		@Override
@@ -54,14 +56,13 @@ public class GameActivity extends BaseGameActivity implements IOnSceneTouchListe
 
 		@Override
 		public void updateHitCount(int hitCount) {
+			GameActivity.this.hitCount = hitCount;
 			fontObject.getScore().setText(String.valueOf(hitCount));
 		}
 
 		@Override
 		public void checkWin(int hitCount) {
 			if (hitCount >= 10) {
-				// gamemodestatus = GAMEMODESTATUS.WIN;
-				// updateMode();
 			}
 
 		}
@@ -138,7 +139,7 @@ public class GameActivity extends BaseGameActivity implements IOnSceneTouchListe
 		/**
 		 * create main scene
 		 */
-		mainScene.setBackground(new ColorBackground(0.09804f, 0.6274f, 0.8784f));
+		mainScene.setBackground(new ColorBackground(0f, 0f, 0f));
 		mainScene.setOnSceneTouchListener(this);
 		mEngine.registerUpdateHandler(new FPSLogger());
 		bgGame.onLoadScene(mCamera, null);
@@ -232,12 +233,18 @@ public class GameActivity extends BaseGameActivity implements IOnSceneTouchListe
 					if (time == 0) {
 						gamemodestatus = GAMEMODESTATUS.FAIL;
 						updateMode();
+
+						updateUiEndGame();
 					}
 				}
 			}
 		});
 
 		getEngine().registerUpdateHandler(spriteTimerHandler);
+	}
+
+	private void updateUiEndGame() {
+		new DataHitCount(this).saveHitCount(hitCount);
 	}
 
 	private void updateTime() {
@@ -263,7 +270,8 @@ public class GameActivity extends BaseGameActivity implements IOnSceneTouchListe
 			gamemodestatus = GAMEMODESTATUS.PAUSE;
 			updateMode();
 			return false;
-		} else if (gamemodestatus == GAMEMODESTATUS.PAUSE) {
+		} else if (keyCode == KeyEvent.KEYCODE_BACK && gamemodestatus == GAMEMODESTATUS.PAUSE) {
+			finish();
 			return false;
 		}
 
@@ -281,6 +289,7 @@ public class GameActivity extends BaseGameActivity implements IOnSceneTouchListe
 			win.setVisible(true);
 		} else if (gamemodestatus == GAMEMODESTATUS.FAIL) {
 			fail.setVisible(true);
+
 		} else if (gamemodestatus == GAMEMODESTATUS.RUN) {
 			targetAndProjectileManager.registerOrUnRegisterMove(true);
 		}
@@ -291,7 +300,6 @@ public class GameActivity extends BaseGameActivity implements IOnSceneTouchListe
 		if (gamemodestatus == GAMEMODESTATUS.RUN) {
 			gamemodestatus = GAMEMODESTATUS.PAUSE;
 			updateMode();
-			// backgroundMusic.pause();
 		}
 
 		super.onPauseGame();

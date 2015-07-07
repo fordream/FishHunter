@@ -192,8 +192,7 @@ public abstract class TargetAndProjectileManager {
 		int rangeY = maxY - minY;
 		int y = rand.nextInt(rangeY) + minY;
 
-		// Sprite target = new Sprite(x, y, this.target.getTextureRegion()
-		// .deepCopy());
+		
 		AnimatedSprite target = new AnimatedSprite(x, y, runningCat.getRegCat());
 		target.animate(300);
 		mainScene.attachChild(target);
@@ -243,7 +242,7 @@ public abstract class TargetAndProjectileManager {
 		}
 
 		// - region.getWidth() / 2
-		AnimatedSprite projectile = new AnimatedSprite(playerCenterX - region.getWidth() / 2 + 30, playerCenterY - region.getHeight() / 2, region);
+		AnimatedSprite projectile = new AnimatedSprite(playerCenterX - region.getWidth() / 2 + 20, playerCenterY - region.getHeight() / 2, region);
 		projectile.animate(300);
 		mainScene.attachChild(projectile, 1);
 

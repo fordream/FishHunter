@@ -1,14 +1,15 @@
 package com.example.game;
 
+import org.vnp.urohunter.R;
 import vnp.com.activity.GameActivity;
-
-import com.vnp.core.common.CommonAndroid;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.TextView;
+import com.example.game.object.DataHitCount;
+import com.vnp.core.common.CommonAndroid;
 
 public class MenuGameActivity extends Activity implements OnClickListener {
 	@Override
@@ -19,6 +20,13 @@ public class MenuGameActivity extends Activity implements OnClickListener {
 		findViewById(R.id.score).setOnClickListener(this);
 		findViewById(R.id.moregame).setOnClickListener(this);
 		findViewById(R.id.score).setVisibility(View.GONE);
+	}
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+		TextView maxhitcount = CommonAndroid.getView(this, R.id.maxhitcount);
+		maxhitcount.setText(String.format(getString(R.string.hitccont_format), new DataHitCount(this).getHitCount()));
 	}
 
 	@Override

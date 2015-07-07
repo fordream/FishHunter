@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="hello">Hello World, AndEngineSimpleGame!</string>
-    <string name="app_name">Firsh Hunter</string>
+    <string name="app_name">UFO Hunter</string>
+    <string name="hitccont_format">Max point : %s</string>
+    
 </resources>

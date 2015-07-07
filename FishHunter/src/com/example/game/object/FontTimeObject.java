@@ -26,7 +26,7 @@ public class FontTimeObject {
 
 	public void onLoadResources(Engine mEngine) {
 		mFontTexture = new BitmapTextureAtlas(512, 512, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
-		mFont = new Font(mFontTexture, Typeface.create(Typeface.DEFAULT, Typeface.BOLD), 40, true, Color.BLACK);
+		mFont = new Font(mFontTexture, Typeface.create(Typeface.DEFAULT, Typeface.BOLD), 40, true, Color.WHITE);
 		mEngine.getTextureManager().loadTexture(mFontTexture);
 		mEngine.getFontManager().loadFont(mFont);
 	}
